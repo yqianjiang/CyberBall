@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hans">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -10,14 +10,13 @@
             max-width: 800px;
             margin: 0 auto;
         }
+        header {
+            text-align: center;
+        }
 
         .wrapper {
-            margin-top: 10rem;
-            /* display: flex; */
+            margin: 1rem;
             cursor: pointer;
-            /* 子元素有3d遮挡关系 */
-            /* transform-style: preserve-3d; */
-            /* cursor: e-resize; */
             display:grid; 
             grid-template-columns: 1fr 1fr 1fr 1fr 1fr;grid-template-rows: 1fr 1fr;
             grid-gap: 0.5rem;
@@ -27,7 +26,6 @@
 
         .wrapper > * {
             border-radius: 1rem;
-            margin-left: 2rem;
             transition: 1s cubic-bezier(0.19, 1, 0.22, 1);
         }
 
@@ -103,7 +101,7 @@
 </head>
 <body>
     <div class="body-wrapper">
-        <header><h1>CSS练习</h1></header>
+        <header><h1></h1></header>
         <main>
             <div class="wrapper">
                 <div class="box1">1</div>
