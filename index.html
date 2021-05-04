@@ -99,7 +99,7 @@
 
     </style>
 </head>
-<body ontouchstart="" ontouchend="">
+<body ontouchstart="" ontouchend="" ontouchcancel="">
     <div class="body-wrapper">
         <header><h1></h1></header>
         <main>
@@ -117,7 +117,7 @@
     <script>
     document.body.addEventListener("touchstart", function() {});
     document.body.addEventListener("touchend", function() {});
-    // document.body.addEventListener("touchcancel", function() {});
+    document.body.addEventListener("touchcancel", function() {});
     </script>
 </body>
 </html>
