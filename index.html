@@ -74,8 +74,7 @@
             transform: rotate(180deg) scale(0.5);
         }
 
-        .box4:hover,
-        .box4:focus {
+        .box4:hover {
             width: 200px;
             height: 180px;
             opacity: 50%;
@@ -100,7 +99,7 @@
 
     </style>
 </head>
-<body>
+<body ontouchstart="">
     <div class="body-wrapper">
         <header><h1></h1></header>
         <main>
@@ -115,6 +114,6 @@
         </main>
         <footer></footer>
     </div>
-
+    <script>document.body.addEventListener("touchstart", function() {});</script>
 </body>
 </html>
