@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hans">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -34,6 +34,18 @@
       }
       img {
         width: 3rem;
+        animation-duration: 0.6s;
+        animation-name: myFrame;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+      }
+      @keyframes myFrame {
+        50% {
+          transform: translate(0, -4rem) rotate(180deg);
+        }
+        to {
+          transform: translate(0, -4rem) rotate(-50deg);
+        }
       }
       .menu {
         grid-column: 2;
