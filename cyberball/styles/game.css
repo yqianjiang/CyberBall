@@ -1,0 +1,29 @@
+body {
+	margin: 0;
+}
+
+/* body里层的游戏画布，设置画布大小及背景 */
+.game-canvas {
+	/* 大小：充满屏幕 */
+	margin: 0 auto;
+	height: 100vh;
+	/* 背景图片 */
+	background-image: url(../Images/background.jpg);
+	background-position: center;
+	background-size: cover;
+}
+
+/* 包裹游戏画布中的元素，不同画面的共同设置 */
+.canvas-wrap {
+	display: flex;
+	height: 100%;
+}
+
+/* 固定在右上角的菜单选项按钮 */
+.menuctl {
+	position:absolute;
+	height: 3rem;
+	width: 3rem;
+	right: 1vw;
+	top: 1vh;
+}

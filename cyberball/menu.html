@@ -5,29 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CyberBall</title>
+    <link rel="stylesheet" href="styles/game.css">
     <style>
-      body {
-        margin: 0;
-      }
-      .game-canvas {
-        margin: 0 auto;
-        height: 100vh;
-        /* width: 90vw; */
-        background-image: url(Images/background.jpg);
-        background-position: center;
-        background-size: cover;
-      }
-      .canvas-wrap {
-        display: flex;
-        height: 100%;
-      }
       .start-page {
-        /* border: solid; */
-        text-align: center;
         width: 100%;
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
         grid-template-rows: 1fr;
+        text-align: center;
         justify-items: center;
         align-items: center;
         font-size: larger;
@@ -68,7 +53,7 @@
           <img src="Images/ball.png" />
           <div class="menu">
             <h1>CyberBall</h1>
-            <button>开始游戏</button>
+            <button onclick="window.open('game.html','_self')">开始游戏</button>
             <button>玩法说明</button>
             <button>游戏选项</button>
           </div>
