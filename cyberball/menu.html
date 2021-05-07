@@ -17,7 +17,7 @@
         align-items: center;
         font-size: larger;
       }
-      img {
+      .ball-ani {
         width: 3rem;
         animation-duration: 0.6s;
         animation-name: myFrame;
@@ -50,14 +50,14 @@
     <div class="game-canvas">
       <div class="canvas-wrap">
         <div class="start-page">
-          <img src="Images/ball.png" />
+          <img class="ball-ani" src="Images/ball.png" />
           <div class="menu">
             <h1>CyberBall</h1>
-            <button onclick="window.open('game.html','_self')">开始游戏</button>
+            <button onclick="location='game.html'">开始游戏</button>
             <button>玩法说明</button>
             <button>游戏选项</button>
           </div>
-          <img src="Images/ball.png" />
+          <img class="ball-ani" src="Images/ball.png" />
         </div>
       </div>
     </div>

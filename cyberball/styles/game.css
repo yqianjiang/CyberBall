@@ -13,17 +13,8 @@ body {
 	background-size: cover;
 }
 
-/* 包裹游戏画布中的元素，不同画面的共同设置 */
+/* 包裹整个游戏，不同页面的共同设置 */
 .canvas-wrap {
 	display: flex;
 	height: 100%;
-}
-
-/* 固定在右上角的菜单选项按钮 */
-.menuctl {
-	position:absolute;
-	height: 3rem;
-	width: 3rem;
-	right: 1vw;
-	top: 1vh;
 }

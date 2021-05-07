@@ -7,25 +7,165 @@
 		<title>CyberBall</title>
 		<link rel="stylesheet" href="styles/game.css" />
 		<style>
-			.game-page {
+			
+			/* 固定在右上角的菜单选项按钮 */
+			#menu-btn {
+				position: absolute;
+				top: 1vh;
+				right: 1vw;
+				width: 3rem;
+				height: 3rem;
+			}
+
+			/* #menu-wrap {
+				position: absolute;
+				top:10vh;
+				left:10vw;
+				width: 80vw;
+				height: 80vh;
+			}
+
+			.menu {
+				background-color: white;
+				margin: 0 auto;
+				width: inherit;
+				max-width: 50rem;
+				height: inherit;
+			} */
+			
+			/* 包裹游戏页面中的主要内容 */
+			#game-page  {
 				width: 100%;
 				display: grid;
 				text-align: center;
 				justify-items: center;
 				align-items: center;
 			}
+
+			/* 页面的共同设置 */
+			.main-page,
+			.pre-begin-page {
+				width: inherit;
+				height: 100%;
+			}
+
+			.player-icon {
+				width: 6rem;
+				margin: 5vh auto 1vh;
+			}
+
+			.player-name > input {
+				width: 5rem;
+				font-size: smaller;
+			}
+			
+			.btn-wrap {
+				margin-top: 5vh;
+			}
+
+			h2 {
+				margin: 0 auto;
+			}
 		</style>
 	</head>
 	<body>
 		<div class="game-canvas">
 			<div class="canvas-wrap">
-				<div class="menuctl">
-					<button onclick="window.open('menu.html','_self')">返回</button>
-				</div>
-				<div class="game-page">
-					<h2>游戏正在开发中，敬请期待 :)</h2>
+				<div id="game-page">
+
+
+					<h1>CyberBall</h1>
+
+					<!-- page-1 -->
+					<div class="pre-begin-page" v-if="show_pre">
+						<div class="player-name">
+							昵称：<input
+								type="text"
+								placeholder="请输入昵称"
+								v-model="player_name"
+							/>
+						</div>
+						<div class="player-icon">
+							<img
+								id="player-img"
+								src="Images/Cyberboy/idle-right.png"
+								width="100%"
+								:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue}deg); width: 100%;`"
+							/>
+						</div>
+						<input id="color-bar" type="range" max="360" v-model="player_hue" />
+						<div class="btn-wrap">
+							<button id="enter-btn" v-on:click="enterGame">进入游戏</button>
+						</div>
+					</div>
+
+					<!-- page-2 -->
+					<div class="main-page" v-if="show_main">
+						<h2>游戏正在开发中，敬请期待 :)</h2>
+						<div class="player-icon">
+							<img
+								id="player-img"
+								src="Images/Cyberboy/idle-right.png"
+								width="100%"
+								:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue}deg); width: 100%;`"
+							/>
+						</div>
+						<p>{{ player_name }}</p>
+					</div>
+
+
+					<!-- 菜单 -->
+					<div id="menu-btn">
+						<button v-on:click="openMenu">返回</button>
+					</div>
+					<div id="menu-wrap" v-if="show_menu">
+						<!-- <div class="menu"></div> -->
+					</div>
 				</div>
 			</div>
 		</div>
+		<script src="https://unpkg.com/vue@next"></script>
+		<script>
+			//vue3控制的部分
+			const MyGame = {
+				data() {
+					return {
+						//变量初始值设置
+						show_pre: true,
+						show_main: false,
+						show_menu: false,
+						player_hue: 180,
+						player_name: "",
+					};
+				},
+				methods: {
+					enterGame() {
+						this.show_pre = false;
+						this.show_main = true;
+					},
+					openMenu() {
+						if (this.show_pre) {
+							location = "menu.html";
+						}
+						if (this.show_main) {
+							// this.show_menu = true;
+							this.show_main=false;
+							this.show_pre=true;
+						}
+					},
+				},
+			};
+
+			myGame = Vue.createApp(MyGame).mount("#game-page");
+		</script>
+
+		<script>
+			//按下“进入游戏”按钮
+			// let enterBtn = document.getElementById("enter-btn");
+			// function enterGame() {
+			//
+			//}
+			// enterBtn.addEventListener("onclick", enterGame, false)
+		</script>
 	</body>
 </html>
