@@ -18,3 +18,10 @@ body {
 	display: flex;
 	height: 100%;
 }
+
+button {
+	height: 2rem;
+	width: 8rem;
+	margin: 2vh;
+	font-size: 1rem;
+}

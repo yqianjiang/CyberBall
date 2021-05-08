@@ -13,8 +13,10 @@
 				position: absolute;
 				top: 1vh;
 				right: 1vw;
+			}
+			#menu-btn > button {
 				width: 3rem;
-				height: 3rem;
+				font-size: small;
 			}
 
 			/* #menu-wrap {
@@ -66,14 +68,16 @@
 			h2 {
 				margin: 0 auto;
 			}
+
+			[v-cloak] {
+				display: none !important;
+			}
 		</style>
 	</head>
 	<body>
 		<div class="game-canvas">
 			<div class="canvas-wrap">
-				<div id="game-page">
-
-
+				<div id="game-page" v-cloak>
 					<h1>CyberBall</h1>
 
 					<!-- page-1 -->
