@@ -11,12 +11,12 @@
 			/* 固定在右上角的菜单选项按钮 */
 			#menu-btn {
 				position: absolute;
-				top: 1vh;
-				right: 1vw;
+				top: 0;
+				right: 0;
 			}
 			#menu-btn > button {
-				width: 3rem;
-				font-size: small;
+				width: 4rem;
+				font-size: .8rem;
 			}
 
 			/* #menu-wrap {
@@ -53,14 +53,20 @@
 
 			.player-icon {
 				width: 6rem;
-				margin: 5vh auto 1vh;
+				margin: 6vh auto 2vh;
 			}
 
 			.player-name > input {
 				width: 5rem;
 				font-size: smaller;
 			}
-			
+
+			.row{
+				display:flex;
+				align-items: flex-end;
+				justify-content: center;
+			}
+
 			.btn-wrap {
 				margin-top: 5vh;
 			}
@@ -94,10 +100,17 @@
 								id="player-img"
 								src="Images/Cyberboy/idle-right.png"
 								width="100%"
-								:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue}deg); width: 100%;`"
+								:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue}deg) grayscale(${player_gray}%); width: 100%;`"
 							/>
 						</div>
-						<input id="color-bar" type="range" max="360" v-model="player_hue" />
+						<div class="color-option">
+							<div class="row">
+								色调：<input class="color-bar" type="range" max="360" v-model="player_hue" />
+							</div>
+							<div class="row">
+								灰度：<input class="color-bar" type="range" v-model="player_gray" />
+							</div>
+						</div>
 						<div class="btn-wrap">
 							<button id="enter-btn" v-on:click="enterGame">进入游戏</button>
 						</div>
@@ -111,7 +124,7 @@
 								id="player-img"
 								src="Images/Cyberboy/idle-right.png"
 								width="100%"
-								:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue}deg); width: 100%;`"
+								:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue}deg) grayscale(${player_gray}%); width: 100%;`"
 							/>
 						</div>
 						<p>{{ player_name }}</p>
@@ -139,6 +152,7 @@
 						show_main: false,
 						show_menu: false,
 						player_hue: 180,
+						player_gray:0,
 						player_name: "",
 					};
 				},
