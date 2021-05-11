@@ -1,5 +1,16 @@
-body {
+* {
 	margin: 0;
+}
+
+h1 {
+	margin: 0.67em auto 0.67em;
+}
+
+button {
+	height: 2rem;
+	width: 8rem;
+	margin: 2vh;
+	font-size: 1rem;
 }
 
 /* body里层的游戏画布，设置画布大小及背景 */
@@ -17,11 +28,4 @@ body {
 .canvas-wrap {
 	display: flex;
 	height: 100%;
-}
-
-button {
-	height: 2rem;
-	width: 8rem;
-	margin: 2vh;
-	font-size: 1rem;
 }

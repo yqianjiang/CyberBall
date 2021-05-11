@@ -7,7 +7,14 @@
 		<title>CyberBall</title>
 		<link rel="stylesheet" href="styles/game.css" />
 		<style>
-			
+			h2 {
+				margin: 0 auto;
+			}
+
+			[v-cloak] {
+				display: none !important;
+			}
+
 			/* 固定在右上角的菜单选项按钮 */
 			#menu-btn {
 				position: absolute;
@@ -51,9 +58,27 @@
 				height: 100%;
 			}
 
+			/* 包裹游戏主界面中所有players的div */
+			.players-wrap {
+				display: grid;
+				grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: 1fr;
+			}
+
+			/* 放单个player图片、球球、名字的盒子（类似container） */
 			.player-icon {
 				width: 6rem;
 				margin: 6vh auto 2vh;
+			}
+			
+			/* .display-names {
+				position: relative;
+				top: -2rem;
+			} */
+			
+			/* 在player头顶占坑（用于排版players位置） */
+			.down {
+				margin-top: 20vh;
 			}
 
 			.player-name > input {
@@ -70,14 +95,6 @@
 			.btn-wrap {
 				margin-top: 5vh;
 			}
-
-			h2 {
-				margin: 0 auto;
-			}
-
-			[v-cloak] {
-				display: none !important;
-			}
 		</style>
 	</head>
 	<body>
@@ -85,7 +102,6 @@
 			<div class="canvas-wrap">
 				<div id="game-page" v-cloak>
 					<h1>CyberBall</h1>
-
 					<!-- page-1 -->
 					<div class="pre-begin-page" v-if="show_pre">
 						<div class="player-name">
@@ -97,7 +113,7 @@
 						</div>
 						<div class="player-icon">
 							<img
-								id="player-img"
+								class="player-img"
 								src="Images/Cyberboy/idle-right.png"
 								width="100%"
 								:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue}deg) grayscale(${player_gray}%); width: 100%;`"
@@ -112,28 +128,59 @@
 							</div>
 						</div>
 						<div class="btn-wrap">
-							<button id="enter-btn" v-on:click="enterGame">进入游戏</button>
+							<button id="enter-btn" @click="enterGame">进入游戏</button>
 						</div>
 					</div>
 
 					<!-- page-2 -->
 					<div class="main-page" v-if="show_main">
 						<h2>游戏正在开发中，敬请期待 :)</h2>
-						<div class="player-icon">
-							<img
-								id="player-img"
-								src="Images/Cyberboy/idle-right.png"
-								width="100%"
-								:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue}deg) grayscale(${player_gray}%); width: 100%;`"
-							/>
+						<div class="players-wrap">
+
+							<!-- player的模版 -->
+							<div class="player-icon">
+								<img
+									class="player1-img"
+									src="Images/Cyberboy/idle-right.png"
+									width="100%"
+									:style="`filter: sepia(1) saturate(20) hue-rotate(${hue[0]}deg) grayscale(${gray[0]}%); width: 100%;`"
+								/>
+								<!-- <img class="ball" src="Images/ball.png"/> -->
+								<p class="display-names">AI1</p>
+							</div>
+
+							<div class="player-icon">
+								<img
+									class="player-img down"
+									src="Images/Cyberboy/idle-right.png"
+									width="100%"
+									:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue}deg) grayscale(${player_gray}%); width: 100%;`"
+								/>
+								<!-- <img class="ball" src="Images/ball.png"/> -->
+								<p class="display-names">{{ player_name }}</p>
+							</div>
+
+							<div class="player-icon">
+								<img
+									class="player2-img"
+									src="Images/Cyberboy/idle-right.png"
+									width="100%"
+									:style="`filter: sepia(1) saturate(20) hue-rotate(${hue[1]}deg) grayscale(${gray[1]}%); width: 100%; transform: scale(-1, 1)`"
+								/>
+								<!-- <img class="ball" src="Images/ball.png"/> -->
+								<p class="display-names">AI2</p>
+							</div>
+
 						</div>
-						<p>{{ player_name }}</p>
 					</div>
 
 
+					<!-- 球 -->
+					<!-- <img class="ball" src="Images/ball.png" :style="`position:absolute; transform:translate(50vw, ${player_pos_y}vh);width: 2rem;`"/> -->
+
 					<!-- 菜单 -->
 					<div id="menu-btn">
-						<button v-on:click="openMenu">返回</button>
+						<button @click="openMenu">返回</button>
 					</div>
 					<div id="menu-wrap" v-if="show_menu">
 						<!-- <div class="menu"></div> -->
@@ -143,17 +190,33 @@
 		</div>
 		<script src="https://unpkg.com/vue@next"></script>
 		<script>
-			//vue3控制的部分
+			// 获取相对于定位容器（文档/绝对定位的祖先元素）的位置
+			function getOffsetTop(item){
+				return item.offsetParent
+						? item.offsetTop + getOffsetTop(item.offsetParent)
+						: item.offsetTop
+			}
+			// 获取元素大小，及相对于视口（viewport）的位置
+			function getVpPosition(item) {
+				return item.getBoundingClientRect()
+			}
+
 			const MyGame = {
 				data() {
 					return {
-						//变量初始值设置
+						// 控制刚加载页面时，各子页面的显示/隐藏
 						show_pre: true,
 						show_main: false,
 						show_menu: false,
+						// 玩家输入的部分，先设个初始值
 						player_hue: 180,
-						player_gray:0,
+						player_gray: 0,
 						player_name: "",
+						// 其他玩家的颜色弄些随机值
+						hue: [Math.random()*360, Math.random()*360],
+						gray: [Math.random()*70, Math.random()*100],
+						// 玩家的y坐标（供球球定位）
+						player_pos_y: 50,
 					};
 				},
 				methods: {
@@ -175,15 +238,6 @@
 			};
 
 			myGame = Vue.createApp(MyGame).mount("#game-page");
-		</script>
-
-		<script>
-			//按下“进入游戏”按钮
-			// let enterBtn = document.getElementById("enter-btn");
-			// function enterGame() {
-			//
-			//}
-			// enterBtn.addEventListener("onclick", enterGame, false)
 		</script>
 	</body>
 </html>
