@@ -23,7 +23,7 @@
 			}
 			#menu-btn > button {
 				width: 4rem;
-				font-size: .8rem;
+				font-size: 0.8rem;
 			}
 
 			/* #menu-wrap {
@@ -41,9 +41,9 @@
 				max-width: 50rem;
 				height: inherit;
 			} */
-			
+
 			/* 包裹游戏页面中的主要内容 */
-			#game-page  {
+			#game-page {
 				width: 100%;
 				display: grid;
 				text-align: center;
@@ -62,7 +62,7 @@
 			.players-wrap {
 				display: grid;
 				grid-template-columns: 1fr 1fr 1fr;
-        grid-template-rows: 1fr;
+				grid-template-rows: 1fr;
 			}
 
 			/* 放单个player图片、球球、名字的盒子（类似container） */
@@ -70,12 +70,12 @@
 				width: 6rem;
 				margin: 6vh auto 2vh;
 			}
-			
+
 			/* .display-names {
 				position: relative;
 				top: -2rem;
 			} */
-			
+
 			/* 在player头顶占坑（用于排版players位置） */
 			.down {
 				margin-top: 20vh;
@@ -86,8 +86,8 @@
 				font-size: smaller;
 			}
 
-			.row{
-				display:flex;
+			.row {
+				display: flex;
 				align-items: flex-end;
 				justify-content: center;
 			}
@@ -99,7 +99,7 @@
 			.leftWard {
 				transform: scale(-1, 1);
 			}
-			
+
 			.rightWard {
 				transform: scale(1, 1);
 			}
@@ -121,7 +121,7 @@
 						</div>
 						<div class="player-icon">
 							<img
-								id = "player00"
+								id="player00"
 								src="Images/Cyberboy/idle-right.png"
 								width="100%"
 								:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[0]}deg) grayscale(${player_gray[0]}%); width: 100%;`"
@@ -129,10 +129,19 @@
 						</div>
 						<div class="color-option">
 							<div class="row">
-								色调：<input class="color-bar" type="range" max="360" v-model="player_hue[0]" />
+								色调：<input
+									class="color-bar"
+									type="range"
+									max="360"
+									v-model="player_hue[0]"
+								/>
 							</div>
 							<div class="row">
-								灰度：<input class="color-bar" type="range" v-model="player_gray[0]" />
+								灰度：<input
+									class="color-bar"
+									type="range"
+									v-model="player_gray[0]"
+								/>
 							</div>
 						</div>
 						<div class="btn-wrap">
@@ -144,7 +153,6 @@
 					<div class="main-page" v-if="show_main">
 						<h2>游戏正在开发中，敬请期待 :)</h2>
 						<div class="players-wrap">
-
 							<!-- player的模版 -->
 							<div class="player-icon">
 								<img
@@ -153,7 +161,7 @@
 									width="100%"
 									:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[1]}deg) grayscale(${player_gray[1]}%); width: 100%;`"
 									@click="moveBallL"
-									@mouseover = "playerTurnL"
+									@mouseover="playerTurnL"
 								/>
 								<!-- <img class="ball" src="Images/ball.png"/> -->
 								<p class="display-names">AI1</p>
@@ -163,7 +171,7 @@
 								<img
 									id="player0"
 									class="down"
-									:class = "leftWard? 'leftWard': 'rightWard'"
+									:class="leftWard? 'leftWard': 'rightWard'"
 									src="Images/Cyberboy/idle-right.png"
 									width="100%"
 									:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[0]}deg) grayscale(${player_gray[0]}%); width: 100%;; transition:1s`"
@@ -172,25 +180,27 @@
 								<p class="display-names">{{ player_name }}</p>
 							</div>
 
-							<div class="player-icon" >
+							<div class="player-icon">
 								<img
-								  id="player2"
+									id="player2"
 									src="Images/Cyberboy/idle-right.png"
 									width="100%"
 									:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[2]}deg) grayscale(${player_gray[2]}%); width: 100%; transform: scale(-1, 1)`"
 									@click="moveBallR"
-									@mouseover = "playerTurnR"
+									@mouseover="playerTurnR"
 								/>
 								<!-- <img class="ball" src="Images/ball.png"/> -->
 								<p class="display-names">AI2</p>
 							</div>
-
 						</div>
 					</div>
 
-
 					<!-- 球 -->
-					<img class="ball" src="Images/ball.png" :style="`position:absolute; transform:translate(${ball_pos[0]}vw, ${ball_pos[1]}rem); width: 2rem; transition: ${ball_move_dur}s linear;`"/>
+					<img
+						class="ball"
+						src="Images/ball.png"
+						:style="`position:absolute; transform:translate(${ball_pos[0]}vw, ${ball_pos[1]}rem); width: 2rem; transition: ${ball_move_dur}s linear;`"
+					/>
 
 					<!-- 菜单 -->
 					<div id="menu-btn">
@@ -207,16 +217,17 @@
 		<script>
 			// rem
 			var fontSize = 16;
-			
+
 			// 获取元素相对于视口（viewport）的位置
 			function getVpPosition(item, dx) {
 				let scalingSize = window.innerWidth / 100;
 				// let player_rect = document.getElementById(item).getBoundingClientRect();
 				let player_rect = item.getBoundingClientRect();
-				return [(player_rect['left']+dx)/scalingSize, (player_rect['top']-5)/fontSize]
+				return [
+					(player_rect["left"] + dx) / scalingSize,
+					(player_rect["top"] - 5) / fontSize,
+				];
 			}
-			
-
 
 			const MyGame = {
 				data() {
@@ -227,39 +238,29 @@
 						show_menu: false,
 						// 玩家相关变量的初始值
 						player_name: "",
-						// player_scale: 1,		
-						leftWard: false,				
+						// player_scale: 1,
+						leftWard: false,
 						// [0]为当前玩家的初始值，后面是其他玩家的随机值
-						player_hue: [180, Math.random()*360, Math.random()*360],
-						player_gray: [0, Math.random()*70, Math.random()*100],
+						player_hue: [180, Math.random() * 360, Math.random() * 360],
+						player_gray: [0, Math.random() * 70, Math.random() * 100],
 						// 球的初始坐标 [x, y]
-						ball_pos:[-10,-10],
+						ball_pos: [-10, -10],
 						ball_move_dur: 0,
 						ball_owner: "player0",
+						ball_receptor: "player0",
 					};
 				},
 				updated() {
 					console.log("updated!");
-				}, 
-				//: {
-					// ball_owner(newOwner, oldOwner){
-					// 	if (newOwner !== oldOwner) this.moveBall();
-					// }
-				//},
+					if (this.ball_receptor !== this.ball_owner) {
+						this.updateBallPos();
+					}
+				},
 				methods: {
 					enterGame() {
 						this.show_pre = false;
 						this.show_main = true;
 						this.moveBall("player0");
-
-						// const changeBallPos = async ()=> {
-						// 	await nextTick(){
-						// 		this.show_main = true;
-						// 	};
-						// 	this.moveBall("player0");
-						// 	console.log(this.ball_owner);
-						// }
-						// changeBallPos();
 					},
 					openMenu() {
 						if (this.show_pre) {
@@ -267,63 +268,57 @@
 						}
 						if (this.show_main) {
 							// this.show_menu = true;
-							this.show_main=false;
-							this.show_pre=true;
+							this.show_main = false;
+							this.show_pre = true;
 							this.moveBall("player00");
 						}
 					},
-					getBallPos(playerId, dx){
-						var timer = null;
-						var pos = this.ball_pos;
-						function checkItem(){
-							let item = document.getElementById(playerId);
-							if (item) {
-								pos = getVpPosition(item, dx);
-								console.log(`timer: ${timer}; ball_pos: ${pos}`)
-								if(timer) {
-									console.log('yeah');
-									clearTimeout(timer);
+					moveBall(ball_receptor="player0", dx = 67){
+						this.ball_receptor = ball_receptor;
+						this.updateBallPos(dx);
+					},
+					updateBallPos(dx = 67) {
+						console.log(
+							`moving from ${this.ball_owner} to ${this.ball_receptor}`
+						);
+						let item = document.getElementById(this.ball_receptor);
+						if (item) {
+							pos = getVpPosition(item, dx);
+							let if_update = true;
+							for (let pos_x of pos) {
+								if (isNaN(pos_x)){
+									if_update = false;
 								}
-							} else {
-								// 自我调用
-								console.log(item);
-								timer = setTimeout(checkItem, 0);
+							}
+							if (if_update) {
+								this.ball_pos = pos;
+								this.ball_owner = this.ball_receptor;
 							}
 						}
-						// 问题：在setTimeout第二次调用checkItem之前，就已经继续运行了后面的代码。
-						// 所以要等前面运行完再继续这个...
-						console.log(`ball_pos: ${pos}`)
-						this.ball_pos = pos;
-					},
-					moveBall(playerId="player0", dx=67) {
-						this.getBallPos(playerId, dx);
-						// 等动画完成后
-						this.$nextTick(function() {
-							this.ball_owner = playerId;
-						})
+						console.log(`球现在在${this.ball_owner}手上, 坐标为：${this.ball_pos}`);
 					},
 					moveBallL() {
-						this.ball_move_dur = .5;
+						this.ball_move_dur = 0.5;
 						this.moveBall("player1");
 					},
 					moveBallR() {
-						this.ball_move_dur = .5;
+						this.ball_move_dur = 0.5;
 						this.moveBall("player2", 0);
 					},
 					playerTurnL() {
 						// this.player_scale = -1;
 						this.leftWard = true;
-						if (this.ball_owner=="player0") {
-							this.ball_move_dur = .5;
-							this.moveBall("player0", 0);						
+						if (this.ball_owner == "player0") {
+							this.ball_move_dur = 0.5;
+							this.updateBallPos(0);
 						}
 					},
 					playerTurnR() {
 						// this.player_scale = 1;
 						this.leftWard = false;
-						if (this.ball_owner=="player0") {
-							this.ball_move_dur = .5;
-							this.moveBall();						
+						if (this.ball_owner == "player0") {
+							this.ball_move_dur = 0.5;
+							this.updateBallPos();
 						}
 					},
 				},
