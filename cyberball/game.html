@@ -95,6 +95,14 @@
 			.btn-wrap {
 				margin-top: 5vh;
 			}
+
+			.leftWard {
+				transform: scale(-1, 1);
+			}
+			
+			.rightWard {
+				transform: scale(1, 1);
+			}
 		</style>
 	</head>
 	<body>
@@ -113,18 +121,18 @@
 						</div>
 						<div class="player-icon">
 							<img
-								class="player-img"
+								id = "player00"
 								src="Images/Cyberboy/idle-right.png"
 								width="100%"
-								:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue}deg) grayscale(${player_gray}%); width: 100%;`"
+								:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[0]}deg) grayscale(${player_gray[0]}%); width: 100%;`"
 							/>
 						</div>
 						<div class="color-option">
 							<div class="row">
-								色调：<input class="color-bar" type="range" max="360" v-model="player_hue" />
+								色调：<input class="color-bar" type="range" max="360" v-model="player_hue[0]" />
 							</div>
 							<div class="row">
-								灰度：<input class="color-bar" type="range" v-model="player_gray" />
+								灰度：<input class="color-bar" type="range" v-model="player_gray[0]" />
 							</div>
 						</div>
 						<div class="btn-wrap">
@@ -140,10 +148,12 @@
 							<!-- player的模版 -->
 							<div class="player-icon">
 								<img
-									class="player1-img"
+									id="player1"
 									src="Images/Cyberboy/idle-right.png"
 									width="100%"
-									:style="`filter: sepia(1) saturate(20) hue-rotate(${hue[0]}deg) grayscale(${gray[0]}%); width: 100%;`"
+									:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[1]}deg) grayscale(${player_gray[1]}%); width: 100%;`"
+									@click="moveBallL"
+									@mouseover = "playerTurnL"
 								/>
 								<!-- <img class="ball" src="Images/ball.png"/> -->
 								<p class="display-names">AI1</p>
@@ -151,21 +161,25 @@
 
 							<div class="player-icon">
 								<img
-									class="player-img down"
+									id="player0"
+									class="down"
+									:class = "leftWard? 'leftWard': 'rightWard'"
 									src="Images/Cyberboy/idle-right.png"
 									width="100%"
-									:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue}deg) grayscale(${player_gray}%); width: 100%;`"
+									:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[0]}deg) grayscale(${player_gray[0]}%); width: 100%;; transition:1s`"
 								/>
 								<!-- <img class="ball" src="Images/ball.png"/> -->
 								<p class="display-names">{{ player_name }}</p>
 							</div>
 
-							<div class="player-icon">
+							<div class="player-icon" >
 								<img
-									class="player2-img"
+								  id="player2"
 									src="Images/Cyberboy/idle-right.png"
 									width="100%"
-									:style="`filter: sepia(1) saturate(20) hue-rotate(${hue[1]}deg) grayscale(${gray[1]}%); width: 100%; transform: scale(-1, 1)`"
+									:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[2]}deg) grayscale(${player_gray[2]}%); width: 100%; transform: scale(-1, 1)`"
+									@click="moveBallR"
+									@mouseover = "playerTurnR"
 								/>
 								<!-- <img class="ball" src="Images/ball.png"/> -->
 								<p class="display-names">AI2</p>
@@ -176,7 +190,7 @@
 
 
 					<!-- 球 -->
-					<!-- <img class="ball" src="Images/ball.png" :style="`position:absolute; transform:translate(50vw, ${player_pos_y}vh);width: 2rem;`"/> -->
+					<img class="ball" src="Images/ball.png" :style="`position:absolute; transform:translate(${ball_pos[0]}vw, ${ball_pos[1]}rem); width: 2rem; transition: ${ball_move_dur}s linear;`"/>
 
 					<!-- 菜单 -->
 					<div id="menu-btn">
@@ -188,18 +202,21 @@
 				</div>
 			</div>
 		</div>
-		<script src="https://unpkg.com/vue@next"></script>
+		<!-- <script src="https://unpkg.com/vue@next"></script> -->
+		<script src="script/vue.global.prod.js"></script>
 		<script>
-			// 获取相对于定位容器（文档/绝对定位的祖先元素）的位置
-			function getOffsetTop(item){
-				return item.offsetParent
-						? item.offsetTop + getOffsetTop(item.offsetParent)
-						: item.offsetTop
+			// rem
+			var fontSize = 16;
+			
+			// 获取元素相对于视口（viewport）的位置
+			function getVpPosition(item, dx) {
+				let scalingSize = window.innerWidth / 100;
+				// let player_rect = document.getElementById(item).getBoundingClientRect();
+				let player_rect = item.getBoundingClientRect();
+				return [(player_rect['left']+dx)/scalingSize, (player_rect['top']-5)/fontSize]
 			}
-			// 获取元素大小，及相对于视口（viewport）的位置
-			function getVpPosition(item) {
-				return item.getBoundingClientRect()
-			}
+			
+
 
 			const MyGame = {
 				data() {
@@ -208,21 +225,41 @@
 						show_pre: true,
 						show_main: false,
 						show_menu: false,
-						// 玩家输入的部分，先设个初始值
-						player_hue: 180,
-						player_gray: 0,
+						// 玩家相关变量的初始值
 						player_name: "",
-						// 其他玩家的颜色弄些随机值
-						hue: [Math.random()*360, Math.random()*360],
-						gray: [Math.random()*70, Math.random()*100],
-						// 玩家的y坐标（供球球定位）
-						player_pos_y: 50,
+						// player_scale: 1,		
+						leftWard: false,				
+						// [0]为当前玩家的初始值，后面是其他玩家的随机值
+						player_hue: [180, Math.random()*360, Math.random()*360],
+						player_gray: [0, Math.random()*70, Math.random()*100],
+						// 球的初始坐标 [x, y]
+						ball_pos:[-10,-10],
+						ball_move_dur: 0,
+						ball_owner: "player0",
 					};
 				},
+				updated() {
+					console.log("updated!");
+				}, 
+				//: {
+					// ball_owner(newOwner, oldOwner){
+					// 	if (newOwner !== oldOwner) this.moveBall();
+					// }
+				//},
 				methods: {
 					enterGame() {
 						this.show_pre = false;
 						this.show_main = true;
+						this.moveBall("player0");
+
+						// const changeBallPos = async ()=> {
+						// 	await nextTick(){
+						// 		this.show_main = true;
+						// 	};
+						// 	this.moveBall("player0");
+						// 	console.log(this.ball_owner);
+						// }
+						// changeBallPos();
 					},
 					openMenu() {
 						if (this.show_pre) {
@@ -232,12 +269,69 @@
 							// this.show_menu = true;
 							this.show_main=false;
 							this.show_pre=true;
+							this.moveBall("player00");
+						}
+					},
+					getBallPos(playerId, dx){
+						var timer = null;
+						var pos = this.ball_pos;
+						function checkItem(){
+							let item = document.getElementById(playerId);
+							if (item) {
+								pos = getVpPosition(item, dx);
+								console.log(`timer: ${timer}; ball_pos: ${pos}`)
+								if(timer) {
+									console.log('yeah');
+									clearTimeout(timer);
+								}
+							} else {
+								// 自我调用
+								console.log(item);
+								timer = setTimeout(checkItem, 0);
+							}
+						}
+						// 问题：在setTimeout第二次调用checkItem之前，就已经继续运行了后面的代码。
+						// 所以要等前面运行完再继续这个...
+						console.log(`ball_pos: ${pos}`)
+						this.ball_pos = pos;
+					},
+					moveBall(playerId="player0", dx=67) {
+						this.getBallPos(playerId, dx);
+						// 等动画完成后
+						this.$nextTick(function() {
+							this.ball_owner = playerId;
+						})
+					},
+					moveBallL() {
+						this.ball_move_dur = .5;
+						this.moveBall("player1");
+					},
+					moveBallR() {
+						this.ball_move_dur = .5;
+						this.moveBall("player2", 0);
+					},
+					playerTurnL() {
+						// this.player_scale = -1;
+						this.leftWard = true;
+						if (this.ball_owner=="player0") {
+							this.ball_move_dur = .5;
+							this.moveBall("player0", 0);						
+						}
+					},
+					playerTurnR() {
+						// this.player_scale = 1;
+						this.leftWard = false;
+						if (this.ball_owner=="player0") {
+							this.ball_move_dur = .5;
+							this.moveBall();						
 						}
 					},
 				},
 			};
 
 			myGame = Vue.createApp(MyGame).mount("#game-page");
+
+			myGame.moveBall("player00");
 		</script>
 	</body>
 </html>
