@@ -174,7 +174,7 @@
 									:class="leftWard? 'leftWard': 'rightWard'"
 									src="Images/Cyberboy/idle-right.png"
 									width="100%"
-									:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[0]}deg) grayscale(${player_gray[0]}%); width: 100%;; transition:1s`"
+									:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[0]}deg) grayscale(${player_gray[0]}%); width: 100%;; transition:0s`"
 								/>
 								<!-- <img class="ball" src="Images/ball.png"/> -->
 								<p class="display-names">{{ player_name }}</p>
@@ -250,17 +250,12 @@
 						ball_receptor: "player0",
 					};
 				},
-				updated() {
-					console.log("updated!");
-					if (this.ball_receptor !== this.ball_owner) {
-						this.updateBallPos();
-					}
-				},
 				methods: {
 					enterGame() {
 						this.show_pre = false;
 						this.show_main = true;
-						this.moveBall("player0");
+						this.ball_receptor = "player0";
+            window.setTimeout(this.delayMoveBall, 10);
 					},
 					openMenu() {
 						if (this.show_pre) {
@@ -270,17 +265,24 @@
 							// this.show_menu = true;
 							this.show_main = false;
 							this.show_pre = true;
-							this.moveBall("player00");
+							this.leftWard = false;
+							this.ball_receptor = "player00";
+							window.setTimeout(this.delayMoveBall, 10);
 						}
 					},
-					moveBall(ball_receptor="player0", dx = 67){
+					delayMoveBall() {
+            this.ball_move_dur = 0;
+            this.updateBallPos();
+          },
+					moveBall(ball_receptor="player0", dur = 0.5, dx = 67, ){
+						this.ball_move_dur = dur;
 						this.ball_receptor = ball_receptor;
 						this.updateBallPos(dx);
 					},
 					updateBallPos(dx = 67) {
-						console.log(
-							`moving from ${this.ball_owner} to ${this.ball_receptor}`
-						);
+						// console.log(
+						// 	`moving from ${this.ball_owner} to ${this.ball_receptor}`
+						// );
 						let item = document.getElementById(this.ball_receptor);
 						if (item) {
 							pos = getVpPosition(item, dx);
@@ -295,21 +297,19 @@
 								this.ball_owner = this.ball_receptor;
 							}
 						}
-						console.log(`球现在在${this.ball_owner}手上, 坐标为：${this.ball_pos}`);
+						// console.log(`球现在在${this.ball_owner}手上, 坐标为：${this.ball_pos}; dx=${dx}`);
 					},
 					moveBallL() {
-						this.ball_move_dur = 0.5;
 						this.moveBall("player1");
 					},
 					moveBallR() {
-						this.ball_move_dur = 0.5;
-						this.moveBall("player2", 0);
+						this.moveBall("player2", dur=0.5, dx=0);
 					},
 					playerTurnL() {
 						// this.player_scale = -1;
 						this.leftWard = true;
 						if (this.ball_owner == "player0") {
-							this.ball_move_dur = 0.5;
+							this.ball_move_dur = 0;
 							this.updateBallPos(0);
 						}
 					},
@@ -317,7 +317,7 @@
 						// this.player_scale = 1;
 						this.leftWard = false;
 						if (this.ball_owner == "player0") {
-							this.ball_move_dur = 0.5;
+							this.ball_move_dur = 0;
 							this.updateBallPos();
 						}
 					},
@@ -326,7 +326,7 @@
 
 			myGame = Vue.createApp(MyGame).mount("#game-page");
 
-			myGame.moveBall("player00");
+			myGame.moveBall("player00", dur=0.);
 		</script>
 	</body>
 </html>
