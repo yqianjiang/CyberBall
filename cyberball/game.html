@@ -121,7 +121,7 @@
 						</div>
 						<div class="player-icon">
 							<img
-								id="player00"
+								ref="player00"
 								src="Images/Cyberboy/idle-right.png"
 								width="100%"
 								:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[0]}deg) grayscale(${player_gray[0]}%); width: 100%;`"
@@ -145,7 +145,7 @@
 							</div>
 						</div>
 						<div class="btn-wrap">
-							<button id="enter-btn" @click="enterGame">进入游戏</button>
+							<button @click="enterGame">进入游戏</button>
 						</div>
 					</div>
 
@@ -156,12 +156,12 @@
 							<!-- player的模版 -->
 							<div class="player-icon">
 								<img
-									id="player1"
+									ref="player1"
 									src="Images/Cyberboy/idle-right.png"
 									width="100%"
 									:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[1]}deg) grayscale(${player_gray[1]}%); width: 100%;`"
-									@click="moveBallL"
-									@mouseover="playerTurnL"
+									@click="moveBall(1)"
+									@mouseover="playerTurn(1)"
 								/>
 								<!-- <img class="ball" src="Images/ball.png"/> -->
 								<p class="display-names">AI1</p>
@@ -169,7 +169,7 @@
 
 							<div class="player-icon">
 								<img
-									id="player0"
+									ref="player0"
 									class="down"
 									:class="leftWard? 'leftWard': 'rightWard'"
 									src="Images/Cyberboy/idle-right.png"
@@ -182,12 +182,12 @@
 
 							<div class="player-icon">
 								<img
-									id="player2"
+									ref="player2"
 									src="Images/Cyberboy/idle-right.png"
 									width="100%"
 									:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[2]}deg) grayscale(${player_gray[2]}%); width: 100%; transform: scale(-1, 1)`"
-									@click="moveBallR"
-									@mouseover="playerTurnR"
+									@click="moveBall(2, undefined, 0)"
+									@mouseover="playerTurn(2)"
 								/>
 								<!-- <img class="ball" src="Images/ball.png"/> -->
 								<p class="display-names">AI2</p>
@@ -199,7 +199,7 @@
 					<img
 						class="ball"
 						src="Images/ball.png"
-						:style="`position:absolute; transform:translate(${ball_pos[0]}vw, ${ball_pos[1]}rem); width: 2rem; transition: ${ball_move_dur}s linear;`"
+						:style="`position:absolute; top:0; left:0; transform:translate(${ball_pos[0]}vw, ${ball_pos[1]}rem); width: 2rem; transition: ${ball_move_dur}s linear;`"
 					/>
 
 					<!-- 菜单 -->
@@ -256,8 +256,7 @@
 					enterGame() {
 						this.show_pre = false;
 						this.show_main = true;
-						this.ball_receptor = "player0";
-            window.setTimeout(this.delayMoveBall, 10);
+						this.delayMoveBall(0);
 					},
 					openMenu() {
 						if (this.show_pre) {
@@ -268,24 +267,26 @@
 							this.show_main = false;
 							this.show_pre = true;
 							this.leftWard = false;
-							this.ball_receptor = "player00";
-							window.setTimeout(this.delayMoveBall, 10);
+							this.delayMoveBall("00");
 						}
 					},
-					delayMoveBall() {
-            this.ball_move_dur = 0;
-            this.updateBallPos();
+					delayMoveBall(target_i) {
+						window.setTimeout(()=>{
+							this.moveBall(target_i, 0);
+						}, 10);
           },
-					moveBall(ball_receptor="player0", dur = 0.5, dx = 67, ){
+					moveBall(target_i=0, dur = 0.5, dx = 67){
 						this.ball_move_dur = dur;
-						this.ball_receptor = ball_receptor;
+						this.ball_receptor = "player"+target_i;
 						this.updateBallPos(dx);
 					},
+					
 					updateBallPos(dx = 67) {
 						// console.log(
-						// 	`moving from ${this.ball_owner} to ${this.ball_receptor}`
-						// );
-						let item = document.getElementById(this.ball_receptor);
+							// 	`moving from ${this.ball_owner} to ${this.ball_receptor}`
+							// );
+						let item = this.$refs[this.ball_receptor];
+						// let item = document.getElementById(this.ball_receptor);
 						if (item) {
 							pos = getVpPosition(item, dx);
 							let if_update = true;
@@ -301,34 +302,36 @@
 						}
 						// console.log(`球现在在${this.ball_owner}手上, 坐标为：${this.ball_pos}; dx=${dx}`);
 					},
-					moveBallL() {
-						this.moveBall("player1");
-					},
-					moveBallR() {
-						this.moveBall("player2", dur=0.5, dx=0);
-					},
-					playerTurnL() {
-						// this.player_scale = -1;
-						this.leftWard = true;
-						if (this.ball_owner == "player0") {
-							this.ball_move_dur = this.player_turn_dur;
-							this.updateBallPos(0);
+
+					playerTurn(idx) {
+						if (idx==1) {
+							this.leftWard = true;
+							// this.player_scale = -1;
 						}
-					},
-					playerTurnR() {
-						// this.player_scale = 1;
-						this.leftWard = false;
+						else if (idx==2) {
+							this.leftWard = false;
+							// this.player_scale = 1;
+						}
 						if (this.ball_owner == "player0") {
 							this.ball_move_dur = this.player_turn_dur;
-							this.updateBallPos();
+							if (idx==1) {
+								this.updateBallPos(0);
+							}
+							else if (idx==2){
+								this.updateBallPos();
+							}
 						}
 					},
 				},
+			
+				mounted() {
+					this.delayMoveBall("00");
+				},	
 			};
 
 			myGame = Vue.createApp(MyGame).mount("#game-page");
 
-			myGame.moveBall("player00", dur=0.);
+			// myGame.moveBall("00", 0);
 		</script>
 	</body>
 </html>
