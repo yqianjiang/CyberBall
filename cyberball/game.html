@@ -174,7 +174,7 @@
 									:class="leftWard? 'leftWard': 'rightWard'"
 									src="Images/Cyberboy/idle-right.png"
 									width="100%"
-									:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[0]}deg) grayscale(${player_gray[0]}%); width: 100%;; transition:0s`"
+									:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[0]}deg) grayscale(${player_gray[0]}%); width: 100%;; transition:${player_turn_dur}s linear`"
 								/>
 								<!-- <img class="ball" src="Images/ball.png"/> -->
 								<p class="display-names">{{ player_name }}</p>
@@ -246,6 +246,8 @@
 						// 球的初始坐标 [x, y]
 						ball_pos: [-10, -10],
 						ball_move_dur: 0,
+						player_turn_dur: 0,
+						// player_turn_dur: 0.5,
 						ball_owner: "player0",
 						ball_receptor: "player0",
 					};
@@ -309,7 +311,7 @@
 						// this.player_scale = -1;
 						this.leftWard = true;
 						if (this.ball_owner == "player0") {
-							this.ball_move_dur = 0;
+							this.ball_move_dur = this.player_turn_dur;
 							this.updateBallPos(0);
 						}
 					},
@@ -317,7 +319,7 @@
 						// this.player_scale = 1;
 						this.leftWard = false;
 						if (this.ball_owner == "player0") {
-							this.ball_move_dur = 0;
+							this.ball_move_dur = this.player_turn_dur;
 							this.updateBallPos();
 						}
 					},
