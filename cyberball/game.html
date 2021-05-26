@@ -58,6 +58,13 @@
 				height: 100%;
 			}
 
+			.ball {
+				position: absolute; 
+				top: 0; 
+				left: 0;
+				width: 2rem;
+			}
+
 			/* 包裹游戏主界面中所有players的div */
 			.players-wrap {
 				display: grid;
@@ -69,6 +76,10 @@
 			.player-icon {
 				width: 6rem;
 				margin: 6vh auto 2vh;
+			}
+
+			.player-img {
+				width: 100%;
 			}
 
 			/* .display-names {
@@ -96,11 +107,11 @@
 				margin-top: 5vh;
 			}
 
-			.leftWard {
+			.player-leftWard {
 				transform: scale(-1, 1);
 			}
 
-			.rightWard {
+			.player-rightWard {
 				transform: scale(1, 1);
 			}
 		</style>
@@ -111,20 +122,21 @@
 				<div id="game-page" v-cloak>
 					<h1>CyberBall</h1>
 					<!-- page-1 -->
-					<div class="pre-begin-page" v-if="show_pre">
+					<div class="pre-begin-page" v-if="show.pre">
 						<div class="player-name">
 							昵称：<input
 								type="text"
 								placeholder="请输入昵称"
-								v-model="player_name"
+								v-model="player.name"
 							/>
 						</div>
 						<div class="player-icon">
 							<img
 								ref="player00"
+								class="player-img"
 								src="Images/Cyberboy/idle-right.png"
 								width="100%"
-								:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[0]}deg) grayscale(${player_gray[0]}%); width: 100%;`"
+								:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[0]}deg) grayscale(${player.grays[0]}%);`"
 							/>
 						</div>
 						<div class="color-option">
@@ -133,14 +145,14 @@
 									class="color-bar"
 									type="range"
 									max="360"
-									v-model="player_hue[0]"
+									v-model="player.hues[0]"
 								/>
 							</div>
 							<div class="row">
 								灰度：<input
 									class="color-bar"
 									type="range"
-									v-model="player_gray[0]"
+									v-model="player.grays[0]"
 								/>
 							</div>
 						</div>
@@ -150,46 +162,45 @@
 					</div>
 
 					<!-- page-2 -->
-					<div class="main-page" v-if="show_main">
+					<div class="main-page" v-if="show.main">
 						<h2>游戏正在开发中，敬请期待 :)</h2>
 						<div class="players-wrap">
 							<!-- player的模版 -->
 							<div class="player-icon">
 								<img
 									ref="player1"
+									class="player-img"
 									src="Images/Cyberboy/idle-right.png"
 									width="100%"
-									:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[1]}deg) grayscale(${player_gray[1]}%); width: 100%;`"
+									:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[1]}deg) grayscale(${player.grays[1]}%);`"
 									@click="moveBall(1)"
 									@mouseover="playerTurn(1)"
 								/>
-								<!-- <img class="ball" src="Images/ball.png"/> -->
 								<p class="display-names">AI1</p>
 							</div>
 
 							<div class="player-icon">
 								<img
 									ref="player0"
-									class="down"
-									:class="leftWard? 'leftWard': 'rightWard'"
+									class="player-img down"
+									:class="player.leftWard? 'player-leftWard': 'player-rightWard'"
 									src="Images/Cyberboy/idle-right.png"
 									width="100%"
-									:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[0]}deg) grayscale(${player_gray[0]}%); width: 100%;; transition:${player_turn_dur}s linear`"
+									:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[0]}deg) grayscale(${player.grays[0]}%); transition:${player.turnDur}s linear`"
 								/>
-								<!-- <img class="ball" src="Images/ball.png"/> -->
-								<p class="display-names">{{ player_name }}</p>
+								<p class="display-names">{{ player.name }}</p>
 							</div>
 
 							<div class="player-icon">
 								<img
 									ref="player2"
+									class="player-img player-leftWard"
 									src="Images/Cyberboy/idle-right.png"
 									width="100%"
-									:style="`filter: sepia(1) saturate(20) hue-rotate(${player_hue[2]}deg) grayscale(${player_gray[2]}%); width: 100%; transform: scale(-1, 1)`"
+									:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[2]}deg) grayscale(${player.grays[2]}%)`"
 									@click="moveBall(2, undefined, 0)"
 									@mouseover="playerTurn(2)"
 								/>
-								<!-- <img class="ball" src="Images/ball.png"/> -->
 								<p class="display-names">AI2</p>
 							</div>
 						</div>
@@ -199,36 +210,26 @@
 					<img
 						class="ball"
 						src="Images/ball.png"
-						:style="`position:absolute; top:0; left:0; transform:translate(${ball_pos[0]}vw, ${ball_pos[1]}rem); width: 2rem; transition: ${ball_move_dur}s linear;`"
+						:style="`transform:translate(${ball.pos[0]}vw, ${ball.pos[1]}rem); transition: ${ball.moveDur}s linear`"
 					/>
 
 					<!-- 菜单 -->
 					<div id="menu-btn">
 						<button @click="openMenu">返回</button>
 					</div>
-					<div id="menu-wrap" v-if="show_menu">
+					<div id="menu-wrap" v-if="show.menu">
 						<!-- <div class="menu"></div> -->
 					</div>
 				</div>
 			</div>
 		</div>
-		<!-- <script src="https://unpkg.com/vue@next"></script> -->
 		<script src="script/vue.global.prod.js"></script>
 		<script>
 			// rem
 			var fontSize = 16;
-			var ball_dx = 67;
+			const ballDx = 67;
+			const ballDy = 5;
 
-			// 获取元素相对于视口（viewport）的位置
-			function getVpPosition(item, dx) {
-				let scalingSize = window.innerWidth / 100;
-				// let player_rect = document.getElementById(item).getBoundingClientRect();
-				let player_rect = item.getBoundingClientRect();
-				return [
-					(player_rect["left"] + dx) / scalingSize,
-					(player_rect["top"] - 5) / fontSize,
-				];
-			}
 
 			function delay(fn, wait) {
 				return function (...args) {
@@ -242,79 +243,92 @@
 				data() {
 					return {
 						// 控制刚加载页面时，各子页面的显示/隐藏
-						show_pre: true,
-						show_main: false,
-						show_menu: false,
-						// 玩家相关变量的初始值
-						player_name: "",
-						// player_scale: 1,
-						leftWard: false,
-						// [0]为当前玩家的初始值，后面是其他玩家的随机值
-						player_hue: [180, Math.random() * 360, Math.random() * 360],
-						player_gray: [0, Math.random() * 70, Math.random() * 100],
-						// 球的初始坐标 [x, y]
-						ball_pos: [-10, -10],
-						ball_move_dur: 0,
-						player_turn_dur: 0.5,
-						ball_owner: "player0",
-						ball_receptor: "player0",
+						show: {
+							pre: true,
+							main: false,
+							menu: false,
+						},
+						player: {
+							name: "",
+							leftWard: false,
+							turnDur: 0.5,
+							// [0]为当前玩家的初始值，后面是其他玩家的随机值
+							hues: [180, Math.random() * 360, Math.random() * 360],
+							grays: [0, Math.random() * 70, Math.random() * 100],
+						},
+						ball: {
+							pos: [0, 0],
+							moveDur: 0,
+							owner: "player0",
+							receptor: "player0",
+						},
 					};
 				},
 				methods: {
+					togglePage(ballOwnerId){
+						this.show.pre = !this.show.pre;
+						this.show.main = !this.show.main;
+						if (this.show.main) {
+							this.player.leftWard = false;
+						};
+						this.delayMoveBall(ballOwnerId);
+					},
 					enterGame() {
-						this.show_pre = false;
-						this.show_main = true;
-						this.delayMoveBall(0);
+						this.togglePage(0);
 					},
 					openMenu() {
-						if (this.show_pre) {
+						if (this.show.pre) {
 							location = "menu.html";
 						}
-						if (this.show_main) {
-							// this.show_menu = true;
-							this.show_main = false;
-							this.show_pre = true;
-							this.leftWard = false;
-							this.delayMoveBall("00");
+						if (this.show.main) {
+							// this.show.menu = true;
+							this.togglePage("00");
 						}
 					},
-					delayMoveBall(target_i, dur = 0) {
+					getTargetPos(dx) {
+						let ballReceptor = this.$refs[this.ball.receptor];
+						if (ballReceptor) {
+							let scalingSize = window.innerWidth / 100;
+							let posX = (ballReceptor.offsetLeft + dx) / scalingSize;
+							let posY = (ballReceptor.offsetTop - ballDy) / fontSize;
+							return [posX, posY];
+						} else {
+							return this.ball.pos;
+						}
+					},
+					moveBall(receptorId = 0, ballMoveDur = 0.5, dx = ballDx) {
+						// 设置移动参数
+						this.ball.moveDur = ballMoveDur;
+						this.ball.receptor = "player" + receptorId;
+						// 移动
+						this.ball.pos = this.getTargetPos(dx);
+						this.ball.owner = this.ball.receptor;
+					},
+					delayMoveBall(receptorId, ballMoveDur = 0) {
 						let moveBall = delay(this.moveBall, 50);
-						moveBall(target_i, dur);
+						moveBall(receptorId, ballMoveDur);
 					},
-
-					moveBall(target_i = 0, dur = 0.5, dx = ball_dx) {
-						this.ball_move_dur = dur;
-						this.ball_receptor = "player" + target_i;
-						let item = this.$refs[this.ball_receptor];
-						if (item) {
-							pos = getVpPosition(item, dx);
-							this.ball_pos = pos;
-							this.ball_owner = this.ball_receptor;
-						}
-					},
-
 					playerTurn(idx) {
 						if (idx == 1) {
-							if (this.leftWard) {
+							if (this.player.leftWard) {
 								return -1;
 							}
-							this.leftWard = true;
+							this.player.leftWard = true;
 						} else if (idx == 2) {
-							if (this.leftWard == false) {
+							if (this.player.leftWard == false) {
 								return -1;
 							}
-							this.leftWard = false;
+							this.player.leftWard = false;
 						}
-						if (this.ball_owner == "player0") {
-							this.ball_move_dur = this.player_turn_dur;
+						if (this.ball.owner == "player0") {
+							this.ball.moveDur = this.player.turnDur;
 							let moveBall = (dx) => {
-								this.ball_pos[0] += dx / (window.innerWidth / 100);
+								this.ball.pos[0] += dx / (window.innerWidth / 100);
 							};
-							if (this.leftWard) {
-								moveBall(-ball_dx);
+							if (this.player.leftWard) {
+								moveBall(-ballDx);
 							} else {
-								moveBall(ball_dx);
+								moveBall(ballDx);
 							}
 						}
 					},
@@ -325,14 +339,13 @@
 
 					//Safari的filter+transition有问题，取消player_turn的动画
 					if (navigator.userAgent.includes("AppleWebKit/6")) {
-						this.player_turn_dur = 0;
+						this.player.turnDur = 0;
 					}
 				},
 			};
 
 			myGame = Vue.createApp(MyGame).mount("#game-page");
 
-			// myGame.moveBall("00", 0);
 		</script>
 	</body>
 </html>
