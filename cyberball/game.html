@@ -230,39 +230,11 @@
 				];
 			}
 
-			// 防抖
-			function debounce(fn, wait) {
-				let timer = null;
-				return function (...args) {
-					clearTimeout(timer);
-					timer = setTimeout(() => {
-						fn(...args);
-					}, wait);
-				};
-			}
-
 			function delay(fn, wait) {
 				return function (...args) {
 					timer = setTimeout(() => {
 						fn(...args);
 					}, wait);
-				};
-			}
-
-			// 节流
-			function throttle(fn, interval = 1000) {
-				let active = true;
-
-				return function (...args) {
-					if (active) {
-						fn(...args);
-						active = false;
-						setTimeout(() => {
-							active = true;
-						}, interval);
-					} else {
-						console.log(active);
-					}
 				};
 			}
 
@@ -350,6 +322,8 @@
 
 				mounted() {
 					this.delayMoveBall("00");
+
+					//Safari的filter+transition有问题，取消player_turn的动画
 					if (navigator.userAgent.includes("AppleWebKit/6")) {
 						this.player_turn_dur = 0;
 					}
