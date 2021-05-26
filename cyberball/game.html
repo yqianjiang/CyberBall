@@ -59,8 +59,8 @@
 			}
 
 			.ball {
-				position: absolute; 
-				top: 0; 
+				position: absolute;
+				top: 0;
 				left: 0;
 				width: 2rem;
 			}
@@ -122,7 +122,7 @@
 				<div id="game-page" v-cloak>
 					<h1>CyberBall</h1>
 					<!-- page-1 -->
-					<div class="pre-begin-page" v-if="show.pre">
+					<div class="pre-begin-page" v-if="isShow.pre">
 						<div class="player-name">
 							昵称：<input
 								type="text"
@@ -162,7 +162,7 @@
 					</div>
 
 					<!-- page-2 -->
-					<div class="main-page" v-if="show.main">
+					<div class="main-page" v-if="isShow.main">
 						<h2>游戏正在开发中，敬请期待 :)</h2>
 						<div class="players-wrap">
 							<!-- player的模版 -->
@@ -174,7 +174,7 @@
 									width="100%"
 									:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[1]}deg) grayscale(${player.grays[1]}%);`"
 									@click="moveBall(1)"
-									@mouseover="playerTurn(1)"
+									@mouseover="playerTurn('left')"
 								/>
 								<p class="display-names">AI1</p>
 							</div>
@@ -183,7 +183,7 @@
 								<img
 									ref="player0"
 									class="player-img down"
-									:class="player.leftWard? 'player-leftWard': 'player-rightWard'"
+									:class="player.isLeftWard? 'player-leftWard': 'player-rightWard'"
 									src="Images/Cyberboy/idle-right.png"
 									width="100%"
 									:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[0]}deg) grayscale(${player.grays[0]}%); transition:${player.turnDur}s linear`"
@@ -199,7 +199,7 @@
 									width="100%"
 									:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[2]}deg) grayscale(${player.grays[2]}%)`"
 									@click="moveBall(2, undefined, 0)"
-									@mouseover="playerTurn(2)"
+									@mouseover="playerTurn('right')"
 								/>
 								<p class="display-names">AI2</p>
 							</div>
@@ -217,7 +217,7 @@
 					<div id="menu-btn">
 						<button @click="openMenu">返回</button>
 					</div>
-					<div id="menu-wrap" v-if="show.menu">
+					<div id="menu-wrap" v-if="isShow.menu">
 						<!-- <div class="menu"></div> -->
 					</div>
 				</div>
@@ -226,10 +226,10 @@
 		<script src="script/vue.global.prod.js"></script>
 		<script>
 			// rem
-			var fontSize = 16;
-			const ballDx = 67;
-			const ballDy = 5;
-
+			let fontSize = 16;
+			const BALL_DX = 67;
+			const BALL_DY = 5;
+			const LOAD_DELAY = 10;
 
 			function delay(fn, wait) {
 				return function (...args) {
@@ -243,14 +243,14 @@
 				data() {
 					return {
 						// 控制刚加载页面时，各子页面的显示/隐藏
-						show: {
+						isShow: {
 							pre: true,
 							main: false,
 							menu: false,
 						},
 						player: {
 							name: "",
-							leftWard: false,
+							isLeftWard: false,
 							turnDur: 0.5,
 							// [0]为当前玩家的初始值，后面是其他玩家的随机值
 							hues: [180, Math.random() * 360, Math.random() * 360],
@@ -265,71 +265,59 @@
 					};
 				},
 				methods: {
-					togglePage(ballOwnerId){
-						this.show.pre = !this.show.pre;
-						this.show.main = !this.show.main;
-						if (this.show.main) {
-							this.player.leftWard = false;
-						};
+					togglePage(ballOwnerId) {
+						this.isShow.pre = !this.isShow.pre;
+						this.isShow.main = !this.isShow.main;
+						if (this.isShow.main) {
+							this.player.isLeftWard = false;
+						}
 						this.delayMoveBall(ballOwnerId);
 					},
 					enterGame() {
 						this.togglePage(0);
 					},
 					openMenu() {
-						if (this.show.pre) {
+						if (this.isShow.pre) {
 							location = "menu.html";
 						}
-						if (this.show.main) {
-							// this.show.menu = true;
+						if (this.isShow.main) {
+							// this.isShow.menu = true;
 							this.togglePage("00");
 						}
 					},
 					getTargetPos(dx) {
 						let ballReceptor = this.$refs[this.ball.receptor];
-						if (ballReceptor) {
-							let scalingSize = window.innerWidth / 100;
-							let posX = (ballReceptor.offsetLeft + dx) / scalingSize;
-							let posY = (ballReceptor.offsetTop - ballDy) / fontSize;
-							return [posX, posY];
-						} else {
-							return this.ball.pos;
-						}
+						if (!ballReceptor) return this.ball.pos;
+						let scalingSize = window.innerWidth / 100;
+						let posX = (ballReceptor.offsetLeft + dx) / scalingSize;
+						let posY = (ballReceptor.offsetTop - BALL_DY) / fontSize;
+						return [posX, posY];
 					},
-					moveBall(receptorId = 0, ballMoveDur = 0.5, dx = ballDx) {
+					moveBall(receptorId = 0, ballMoveDur = 0.5, dx = BALL_DX) {
 						// 设置移动参数
 						this.ball.moveDur = ballMoveDur;
 						this.ball.receptor = "player" + receptorId;
 						// 移动
+						if (this.ball.receptor == this.ball.owner) return -1;
 						this.ball.pos = this.getTargetPos(dx);
 						this.ball.owner = this.ball.receptor;
 					},
 					delayMoveBall(receptorId, ballMoveDur = 0) {
-						let moveBall = delay(this.moveBall, 50);
+						let moveBall = delay(this.moveBall, LOAD_DELAY);
 						moveBall(receptorId, ballMoveDur);
 					},
-					playerTurn(idx) {
-						if (idx == 1) {
-							if (this.player.leftWard) {
-								return -1;
-							}
-							this.player.leftWard = true;
-						} else if (idx == 2) {
-							if (this.player.leftWard == false) {
-								return -1;
-							}
-							this.player.leftWard = false;
-						}
+					playerTurn(direction) {
+						let turnLeft = direction == "left";
+						if (turnLeft == this.player.isLeftWard) return -1;
+						this.player.isLeftWard = turnLeft;
+
 						if (this.ball.owner == "player0") {
 							this.ball.moveDur = this.player.turnDur;
 							let moveBall = (dx) => {
 								this.ball.pos[0] += dx / (window.innerWidth / 100);
 							};
-							if (this.player.leftWard) {
-								moveBall(-ballDx);
-							} else {
-								moveBall(ballDx);
-							}
+							if (turnLeft) moveBall(-BALL_DX);
+							else moveBall(BALL_DX);
 						}
 					},
 				},
@@ -345,7 +333,6 @@
 			};
 
 			myGame = Vue.createApp(MyGame).mount("#game-page");
-
 		</script>
 	</body>
 </html>
