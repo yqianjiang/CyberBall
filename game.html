@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hans">
 	<head>
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -7,12 +7,77 @@
 		<title>CyberBall</title>
 		<link rel="stylesheet" href="styles/game.css" />
 		<style>
-			h2 {
-				margin: 0 auto;
-			}
-
 			[v-cloak] {
 				display: none !important;
+			}
+
+			/* 包裹游戏页面中的主要内容 */
+			#game-page {
+				width: 100%;
+				display: grid;
+				grid-template-rows: 1fr 2fr 0.4fr;
+				justify-items: center;
+				align-items: center;
+				text-align: center;
+			}
+
+			/* 页面的共同设置 */
+			.main-page,
+			.pre-begin-page {
+				width: inherit;
+				height: 100%;
+			}
+
+			.pre-begin-page {
+				display: flex;
+				flex-direction: column;
+				row-gap: 2rem;
+			}
+		</style>
+		<style>
+			/* player.css */
+			/* 包裹游戏主界面中所有players的div */
+			.players-wrap {
+				display: grid;
+				grid-template-columns: 1fr 1fr 1fr;
+				grid-template-rows: 1fr 1fr;
+			}
+
+			/* 用于排版players位置） */
+			.player-down {
+				grid-row: 2;
+				grid-column: 2;
+			}
+
+			/* 用于排版players位置） */
+			.player-right {
+				grid-column: 3;
+			}
+
+			.player-img {
+				width: 6rem;
+			}
+
+			.player-leftWard {
+				transform: scale(-1, 1);
+			}
+
+			.player-rightWard {
+				transform: scale(1, 1);
+			}
+		</style>
+		<style>
+			/* 其他小元件.css */
+			.ball {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 2rem;
+			}
+
+			#input-name {
+				width: 5rem;
+				font-size: smaller;
 			}
 
 			/* 固定在右上角的菜单选项按钮 */
@@ -41,79 +106,6 @@
 				max-width: 50rem;
 				height: inherit;
 			} */
-
-			/* 包裹游戏页面中的主要内容 */
-			#game-page {
-				width: 100%;
-				display: grid;
-				text-align: center;
-				justify-items: center;
-				align-items: center;
-			}
-
-			/* 页面的共同设置 */
-			.main-page,
-			.pre-begin-page {
-				width: inherit;
-				height: 100%;
-			}
-
-			.ball {
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 2rem;
-			}
-
-			/* 包裹游戏主界面中所有players的div */
-			.players-wrap {
-				display: grid;
-				grid-template-columns: 1fr 1fr 1fr;
-				grid-template-rows: 1fr;
-			}
-
-			/* 放单个player图片、球球、名字的盒子（类似container） */
-			.player-icon {
-				width: 6rem;
-				margin: 6vh auto 2vh;
-			}
-
-			.player-img {
-				width: 100%;
-			}
-
-			/* .display-names {
-				position: relative;
-				top: -2rem;
-			} */
-
-			/* 在player头顶占坑（用于排版players位置） */
-			.down {
-				margin-top: 20vh;
-			}
-
-			.player-name > input {
-				width: 5rem;
-				font-size: smaller;
-			}
-
-			.row {
-				display: flex;
-				align-items: flex-end;
-				justify-content: center;
-			}
-
-			.btn-wrap {
-				margin-top: 5vh;
-			}
-
-			.player-leftWard {
-				transform: scale(-1, 1);
-			}
-
-			.player-rightWard {
-				transform: scale(1, 1);
-			}
 		</style>
 	</head>
 	<body>
@@ -123,35 +115,40 @@
 					<h1>CyberBall</h1>
 					<!-- page-1 -->
 					<div class="pre-begin-page" v-if="isShow.pre">
-						<div class="player-name">
-							昵称：<input
+						<div class="input-name-wrap">
+							<label for="input-name">昵称：</label>
+							<input
 								type="text"
 								placeholder="请输入昵称"
+								id="input-name"
 								v-model="player.name"
 							/>
 						</div>
-						<div class="player-icon">
+						<div class="single-player-wrap">
 							<img
 								ref="player00"
 								class="player-img"
 								src="Images/Cyberboy/idle-right.png"
-								width="100%"
 								:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[0]}deg) grayscale(${player.grays[0]}%);`"
 							/>
 						</div>
-						<div class="color-option">
+						<div class="input-color-wrap">
 							<div class="row">
-								色调：<input
+								<label for="input-hue">色调：</label>
+								<input
 									class="color-bar"
 									type="range"
 									max="360"
+									id="input-hue"
 									v-model="player.hues[0]"
 								/>
 							</div>
 							<div class="row">
-								灰度：<input
+								<label for="input-gray">灰度：</label>
+								<input
 									class="color-bar"
 									type="range"
+									id="input-gray"
 									v-model="player.grays[0]"
 								/>
 							</div>
@@ -166,12 +163,12 @@
 						<h2>游戏正在开发中，敬请期待 :)</h2>
 						<div class="players-wrap">
 							<!-- player的模版 -->
-							<div class="player-icon">
+							<div class="single-player-wrap">
 								<img
-									ref="player1"
 									class="player-img"
+									id="player1"
+									ref="player1"
 									src="Images/Cyberboy/idle-right.png"
-									width="100%"
 									:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[1]}deg) grayscale(${player.grays[1]}%);`"
 									@click="moveBall(1)"
 									@mouseover="playerTurn('left')"
@@ -179,24 +176,24 @@
 								<p class="display-names">AI1</p>
 							</div>
 
-							<div class="player-icon">
+							<div class="single-player-wrap player-down">
 								<img
-									ref="player0"
-									class="player-img down"
+									class="player-img"
 									:class="player.isLeftWard? 'player-leftWard': 'player-rightWard'"
+									id="player0"
+									ref="player0"
 									src="Images/Cyberboy/idle-right.png"
-									width="100%"
 									:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[0]}deg) grayscale(${player.grays[0]}%); transition:${player.turnDur}s linear`"
 								/>
 								<p class="display-names">{{ player.name }}</p>
 							</div>
 
-							<div class="player-icon">
+							<div class="single-player-wrap player-right">
 								<img
-									ref="player2"
 									class="player-img player-leftWard"
+									id="player2"
+									ref="player2"
 									src="Images/Cyberboy/idle-right.png"
-									width="100%"
 									:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[2]}deg) grayscale(${player.grays[2]}%)`"
 									@click="moveBall(2, undefined, 0)"
 									@mouseover="playerTurn('right')"
@@ -265,9 +262,9 @@
 					};
 				},
 				methods: {
-					checkInput(){
+					checkInput() {
 						let name = this.player.name;
-						if(!name) {
+						if (!name) {
 							alert("请输入昵称！");
 							return -1;
 						} else if (name.length > 10) {

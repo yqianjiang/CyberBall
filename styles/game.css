@@ -2,19 +2,6 @@
 	margin: 0;
 }
 
-/* html {  font-size: 26.66667vw !important; } */
-
-h1 {
-	margin: 0.67em auto 0.67em;
-}
-
-button {
-	height: 2rem;
-	width: 8rem;
-	margin: 2vh;
-	font-size: 1rem;
-}
-
 /* body里层的游戏画布，设置画布大小及背景 */
 .game-canvas {
 	/* 大小：充满屏幕 */
@@ -30,4 +17,17 @@ button {
 .canvas-wrap {
 	display: flex;
 	height: 100%;
+}
+
+/* 通用样式 */
+.row {
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+}
+
+button {
+	height: 2rem;
+	width: 8rem;
+	font-size: 1rem;
 }
