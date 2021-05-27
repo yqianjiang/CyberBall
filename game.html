@@ -323,6 +323,7 @@
 						this.player.isLeftWard = turnLeft;
 
 						if (this.ball.owner !== "player0") return -1;
+						// 移动球
 						const moveBall = (dx) => {
 							this.ball.pos[0] += dx / (window.innerWidth / 100);
 						};
@@ -336,7 +337,7 @@
 				mounted() {
 					this.delayMoveBall("00");
 
-					//Safari的filter+transition有问题，取消player_turn的动画
+					// Safari的filter+transition有问题，取消player_turn的动画
 					if (navigator.userAgent.includes("AppleWebKit/6")) {
 						this.player.turnDur = 0;
 					}
