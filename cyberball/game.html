@@ -231,13 +231,13 @@
 			const BALL_DY = 5;
 			const LOAD_DELAY = 10;
 
-			function delay(fn, wait) {
+			const delay = function delayCallFn(fn, delayTime) {
 				return function (...args) {
-					timer = setTimeout(() => {
+					let timer = setTimeout(() => {
 						fn(...args);
-					}, wait);
+					}, delayTime);
 				};
-			}
+			};
 
 			const MyGame = {
 				data() {
@@ -265,6 +265,16 @@
 					};
 				},
 				methods: {
+					checkInput(){
+						let name = this.player.name;
+						if(!name) {
+							alert("请输入昵称！");
+							return -1;
+						} else if (name.length > 10) {
+							alert("名字太长了！");
+							return -1;
+						}
+					},
 					togglePage(ballOwnerId) {
 						this.isShow.pre = !this.isShow.pre;
 						this.isShow.main = !this.isShow.main;
@@ -274,6 +284,7 @@
 						this.delayMoveBall(ballOwnerId);
 					},
 					enterGame() {
+						// if(this.checkInput()) return 0;
 						this.togglePage(0);
 					},
 					openMenu() {
@@ -311,14 +322,14 @@
 						if (turnLeft == this.player.isLeftWard) return -1;
 						this.player.isLeftWard = turnLeft;
 
-						if (this.ball.owner == "player0") {
-							this.ball.moveDur = this.player.turnDur;
-							let moveBall = (dx) => {
-								this.ball.pos[0] += dx / (window.innerWidth / 100);
-							};
-							if (turnLeft) moveBall(-BALL_DX);
-							else moveBall(BALL_DX);
-						}
+						if (this.ball.owner !== "player0") return -1;
+						const moveBall = (dx) => {
+							this.ball.pos[0] += dx / (window.innerWidth / 100);
+						};
+
+						this.ball.moveDur = this.player.turnDur;
+						if (turnLeft) moveBall(-BALL_DX);
+						else moveBall(BALL_DX);
 					},
 				},
 
