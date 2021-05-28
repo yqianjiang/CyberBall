@@ -129,7 +129,7 @@
 								ref="player00"
 								class="player-img"
 								src="Images/Cyberboy/idle-right.png"
-								:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[0]}deg) grayscale(${player.grays[0]}%);`"
+								:style="playerColor0"
 							/>
 						</div>
 						<div class="input-color-wrap">
@@ -140,7 +140,7 @@
 									type="range"
 									max="360"
 									id="input-hue"
-									v-model="player.hues[0]"
+									v-model="player.hue"
 								/>
 							</div>
 							<div class="row">
@@ -149,7 +149,7 @@
 									class="color-bar"
 									type="range"
 									id="input-gray"
-									v-model="player.grays[0]"
+									v-model="player.gray"
 								/>
 							</div>
 						</div>
@@ -169,7 +169,7 @@
 									id="player1"
 									ref="player1"
 									src="Images/Cyberboy/idle-right.png"
-									:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[1]}deg) grayscale(${player.grays[1]}%);`"
+									:style="playerColor1"
 									@click="moveBall(1)"
 									@mouseover="playerTurn('left')"
 								/>
@@ -183,7 +183,7 @@
 									id="player0"
 									ref="player0"
 									src="Images/Cyberboy/idle-right.png"
-									:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[0]}deg) grayscale(${player.grays[0]}%); transition:${player.turnDur}s linear`"
+									:style="playerStyle"
 								/>
 								<p class="display-names">{{ player.name }}</p>
 							</div>
@@ -194,7 +194,7 @@
 									id="player2"
 									ref="player2"
 									src="Images/Cyberboy/idle-right.png"
-									:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[2]}deg) grayscale(${player.grays[2]}%)`"
+									:style="playerColor2"
 									@click="moveBall(2, undefined, 0)"
 									@mouseover="playerTurn('right')"
 								/>
@@ -207,7 +207,7 @@
 					<img
 						class="ball"
 						src="Images/ball.png"
-						:style="`transform:translate(${ball.pos[0]}vw, ${ball.pos[1]}rem); transition: ${ball.moveDur}s linear`"
+						:style="ballStyle"
 					/>
 
 					<!-- 菜单 -->
@@ -250,8 +250,9 @@
 							isLeftWard: false,
 							turnDur: 0.5,
 							// [0]为当前玩家的初始值，后面是其他玩家的随机值
-							hues: [180, Math.random() * 360, Math.random() * 360],
-							grays: [0, Math.random() * 70, Math.random() * 100],
+							filter: "sepia(1) saturate(20)",
+							hue: 180,
+							gray: 0,
 						},
 						ball: {
 							pos: [0, 0],
@@ -260,6 +261,23 @@
 							receptor: "player0",
 						},
 					};
+				},
+				computed: {
+					playerColor0() {
+						return {"filter": `${this.player.filter} hue-rotate(${this.player.hue}deg) grayscale(${this.player.gray}%)`}
+					},
+					playerColor1() {
+						return {"filter": `${this.player.filter} hue-rotate(${Math.random() * 360}deg) grayscale(${Math.random() * 100}%)`}
+					},
+					playerColor2() {
+						return {"filter": `${this.player.filter} hue-rotate(${Math.random() * 360}deg) grayscale(${Math.random() * 100}%)`}
+					},
+					playerStyle() {
+						return `filter: ${this.player.filter} hue-rotate(${this.player.hue}deg) grayscale(${this.player.gray}%); transition:${this.player.turnDur}s linear`
+					},
+					ballStyle() {
+						return `transform:translate(${this.ball.pos[0]}vw, ${this.ball.pos[1]}rem); transition: ${this.ball.moveDur}s linear`
+					}
 				},
 				methods: {
 					checkInput() {
