@@ -129,7 +129,7 @@
 								ref="player00"
 								class="player-img"
 								src="Images/Cyberboy/idle-right.png"
-								:style="playerColor0"
+								:style="playerColor[0]"
 							/>
 						</div>
 						<div class="input-color-wrap">
@@ -169,7 +169,7 @@
 									id="player1"
 									ref="player1"
 									src="Images/Cyberboy/idle-right.png"
-									:style="playerColor1"
+									:style="playerColor[1]"
 									@click="moveBall(1)"
 									@mouseover="playerTurn('left')"
 								/>
@@ -194,7 +194,7 @@
 									id="player2"
 									ref="player2"
 									src="Images/Cyberboy/idle-right.png"
-									:style="playerColor2"
+									:style="playerColor[2]"
 									@click="moveBall(2, undefined, 0)"
 									@mouseover="playerTurn('right')"
 								/>
@@ -263,23 +263,24 @@
 					};
 				},
 				computed: {
-					playerColor0() {
-						return {"filter": `${this.player.filter} hue-rotate(${this.player.hue}deg) grayscale(${this.player.gray}%)`}
-					},
-					playerColor1() {
-						return {"filter": `${this.player.filter} hue-rotate(${Math.random() * 360}deg) grayscale(${Math.random() * 100}%)`}
-					},
-					playerColor2() {
-						return {"filter": `${this.player.filter} hue-rotate(${Math.random() * 360}deg) grayscale(${Math.random() * 100}%)`}
+					playerColor() {
+						return [
+							this.getPlayerColor(this.player.hue, this.player.gray), 
+							this.getPlayerColor(), 
+							this.getPlayerColor()
+						]
 					},
 					playerStyle() {
-						return `filter: ${this.player.filter} hue-rotate(${this.player.hue}deg) grayscale(${this.player.gray}%); transition:${this.player.turnDur}s linear`
+						return this.getPlayerColor(this.player.hue, this.player.gray, this.player.turnDur)
 					},
 					ballStyle() {
 						return `transform:translate(${this.ball.pos[0]}vw, ${this.ball.pos[1]}rem); transition: ${this.ball.moveDur}s linear`
 					}
 				},
 				methods: {
+					getPlayerColor(hue = Math.random() * 360, gray = Math.random() * 100, turnDur=0) {
+						return `filter: ${this.player.filter} hue-rotate(${hue}deg) grayscale(${gray}%); transition:${turnDur}s linear`
+					},
 					checkInput() {
 						let name = this.player.name;
 						if (!name) {
