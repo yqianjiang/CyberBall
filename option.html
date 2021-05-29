@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>CyberBall</title>
 		<link rel="stylesheet" href="styles/game.css" />
+		<link rel="stylesheet" href="styles/player.css" />
 		<style>
 			* {
 				text-align: center;
@@ -19,17 +20,6 @@
 				align-items: center;
 				text-align: center;
 			}
-
-			.players-wrap {
-				display: grid;
-				grid-template-columns: 1fr 1fr 1fr 1fr;
-				grid-template-rows: 1fr 1fr 1fr;
-				align-items: center;
-			}
-
-			.player-img {
-				width: 6rem;
-			}
 		</style>
 	</head>
 	<body>
@@ -38,18 +28,21 @@
 				<div id="game-page">
 					<h1>CyberBall</h1>
 					<div class="players-wrap">
-						<!-- <single-player-wrap
+						<single-player-wrap
 							v-for="playerX in player.list"
 							:pos="playerX"
 							:key="playerX.id"
-						></single-player-wrap> -->
+						></single-player-wrap>
 
 						<div :style="gridArea[1]" v-show="player.show[1]">
 							<img class="player-img" src="Images/Cyberboy/idle-right.png" />
 							<p class="display-names">{{ playerName[1] }}</p>
 						</div>
 						<div :style="gridArea[2]" v-show="player.show[2]">
-							<img class="player-img" src="Images/Cyberboy/idle-right.png" />
+							<img
+								class="player-img player-leftWard"
+								src="Images/Cyberboy/idle-right.png"
+							/>
 							<p class="display-names">{{ playerName[2] }}</p>
 						</div>
 						<div :style="gridArea[3]" v-show="player.show[3]">
@@ -57,11 +50,17 @@
 							<p class="display-names">{{ playerName[3] }}</p>
 						</div>
 						<div :style="gridArea[4]" v-show="player.show[4]">
-							<img class="player-img" src="Images/Cyberboy/idle-right.png" />
+							<img
+								class="player-img player-leftWard"
+								src="Images/Cyberboy/idle-right.png"
+							/>
 							<p class="display-names">{{ playerName[4] }}</p>
 						</div>
 						<div :style="gridArea[5]" v-show="player.show[5]">
-							<img class="player-img" src="Images/Cyberboy/idle-right.png" />
+							<img
+								class="player-img player-leftWard"
+								src="Images/Cyberboy/idle-right.png"
+							/>
 							<p class="display-names">{{ playerName[5] }}</p>
 						</div>
 						<div :style="gridArea[6]" v-show="player.show[6]">
@@ -69,7 +68,10 @@
 							<p class="display-names">{{ playerName[6] }}</p>
 						</div>
 						<div :style="gridArea[7]" v-show="player.show[7]">
-							<img class="player-img" src="Images/Cyberboy/idle-right.png" />
+							<img
+								class="player-img player-leftWard"
+								src="Images/Cyberboy/idle-right.png"
+							/>
 							<p class="display-names">{{ playerName[7] }}</p>
 						</div>
 						<div :style="gridArea[8]" v-show="player.show[8]">
@@ -128,10 +130,17 @@
 							num: 3,
 							show: [true, true, true],
 							list: [
-								{ id: 0, x: 3, y: "2/4" },
-								{ id: 1, x: "2/4", y: 1 },
-								{ id: 2, x: "2/4", y: 4 },
+								{ id: 0, gridArea: ""},
 							],
+							modeMap : {
+								3: [],
+								4: [],
+								5: [0],
+								6: [0, 3],
+								7: [0, 1, 2, 5],
+								8: [0, 1, 2, 3],
+								9: [1, 2, 3, 4],
+							},
 						},
 					};
 				},
@@ -142,56 +151,40 @@
 				},
 				computed: {
 					gridArea() {
-						return this.getGridArea();
+						let newList = [];
+						for (let i = 0; i < 9; i++) {
+							newList.push(this.getGridArea(i));
+						}
+						return newList;
 					},
 					playerName() {
 						return [0, "1", "2", 3, 4, 5, 6, 7, "8"];
 					},
 				},
 				methods: {
-					getGridArea() {
-						let arr = [];
-						let mode2list;
-						const modeMap = {
-							3: [],
-							4: [],
-							5: [0],
-							6: [0, 3],
-							7: [0, 1, 2, 5],
-							8: [0, 1, 2, 3],
-							9: [1, 2, 3, 4],
-						};
-						if (!isNaN(this.player.num) && this.player.num) {
-							mode2list = modeMap[this.player.num];
+					getMode2list() {
+						let list = [];
+						let mode2list = this.player.modeMap[this.player.num];
+						if (mode2list) list=mode2list;
+						return list;
+					},
+					getGridArea(i) {
+						if (this.getMode2list().includes(i)) {
+							return `grid-area: ${this.rect.mode2[i]}`
 						} else {
-							mode2list = modeMap["9"];
+							return `grid-area: ${this.rect.mode1[i]}`
 						}
-
-						for (let i = 0; i < 9; i++) {
-							if (mode2list.includes(i)) {
-								arr.push({
-									"grid-area": this.rect.mode2[i],
-								});
-							} else {
-								arr.push({
-									"grid-area": this.rect.mode1[i],
-								});
-							}
-						}
-						return arr;
 					},
 					initPlayersPos() {
-						if (!this.checkPlayerNum()) {
-							return -1;
-						}
-
+						if (!this.checkPlayerNum()) return -1;
 						this.hidePlayers();
-
+						let newList = [];
 						for (let i = 0; i < this.player.num; i++) {
-							this.addPlayer(i);
+							this.player.show[i] = true;
+							newList.push({id: i, gridArea: this.getGridArea(i)});
 						}
+						this.player.list = newList;
 					},
-
 					checkPlayerNum() {
 						if (this.player.num < 3 || this.player.num > 9) {
 							alert("请输入3-9之间的数值！");
@@ -210,9 +203,6 @@
 						this.player.show = this.player.show.slice(0, this.player.num);
 					},
 
-					addPlayer(i) {
-						this.player.show[i] = true;
-					},
 				},
 
 				mounted() {
@@ -221,15 +211,17 @@
 			});
 
 			app.component("single-player-wrap", {
-				props: ["pos"],
-
-				template: `<div :style="gridArea">
+				props: ['pos'],
+				template: `
+				<div :style="getGridArea(0)">
         <img
           class="player-img"
           src="Images/Cyberboy/idle-right.png"
         />
         <p class="display-names">AI by vue{{ pos.id }}</p>
-      </div>`,
+      	</div>
+				`,
+
 			});
 
 			app.mount("#game-page");
