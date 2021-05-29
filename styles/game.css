@@ -31,3 +31,15 @@ button {
 	width: 8rem;
 	font-size: 1rem;
 }
+
+/* 固定在右上角的菜单选项按钮 */
+#menu-btn {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+#menu-btn > button {
+	width: 4rem;
+	font-size: 0.8rem;
+}
