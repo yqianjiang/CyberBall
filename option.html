@@ -28,11 +28,11 @@
 				<div id="game-page">
 					<h1>CyberBall</h1>
 					<div class="players-wrap">
-						<single-player-wrap
+						<!-- <single-player-wrap
 							v-for="playerX in player.list"
 							:pos="playerX"
 							:key="playerX.id"
-						></single-player-wrap>
+						></single-player-wrap> -->
 
 						<div :style="gridArea[1]" v-show="player.show[1]">
 							<img class="player-img" src="Images/Cyberboy/idle-right.png" />
@@ -87,7 +87,7 @@
 						请输入玩家数量：
 						<input
 							type="number"
-							v-model="player.num"
+							v-model="player.numInput"
 							value="3"
 							min="3"
 							max="9"
@@ -128,6 +128,7 @@
 						},
 						player: {
 							num: 3,
+							numInput: 3,
 							show: [true, true, true],
 							list: [
 								{ id: 0, gridArea: ""},
@@ -145,7 +146,7 @@
 					};
 				},
 				updated() {
-					if (!isNaN(this.player.num) && this.player.num) {
+					if (this.checkPlayerNum()) {
 						this.initPlayersPos();
 					}
 				},
@@ -163,10 +164,11 @@
 				},
 				methods: {
 					getMode2list() {
-						let list = [];
-						let mode2list = this.player.modeMap[this.player.num];
-						if (mode2list) list=mode2list;
-						return list;
+						if (this.player.num in this.player.modeMap) {
+							return this.player.modeMap[this.player.num];
+						} else {
+							return ;
+						}
 					},
 					getGridArea(i) {
 						if (this.getMode2list().includes(i)) {
@@ -176,25 +178,20 @@
 						}
 					},
 					initPlayersPos() {
-						if (!this.checkPlayerNum()) return -1;
+						this.player.num = this.player.numInput;
 						this.hidePlayers();
-						let newList = [];
+						this.player.list = [];
 						for (let i = 0; i < this.player.num; i++) {
 							this.player.show[i] = true;
-							newList.push({id: i, gridArea: this.getGridArea(i)});
+							this.player.list.push({id: i, gridArea: this.getGridArea(i)});
 						}
-						this.player.list = newList;
 					},
 					checkPlayerNum() {
-						if (this.player.num < 3 || this.player.num > 9) {
-							alert("请输入3-9之间的数值！");
-							console.log(this.player.num);
-							this.player.num < 3
-								? (this.player.num = 3)
-								: (this.player.num = 9);
-							return false;
-						} else {
+						if (this.player.numInput in this.player.modeMap) {
 							return true;
+						} else if (this.player.numInput!=="") {
+							alert("请输入3-9之间的数值！");
+							this.player.numInput = this.player.num;
 						}
 					},
 
@@ -210,19 +207,19 @@
 				},
 			});
 
-			app.component("single-player-wrap", {
-				props: ['pos'],
-				template: `
-				<div :style="getGridArea(0)">
-        <img
-          class="player-img"
-          src="Images/Cyberboy/idle-right.png"
-        />
-        <p class="display-names">AI by vue{{ pos.id }}</p>
-      	</div>
-				`,
+			// app.component("single-player-wrap", {
+			// 	props: ['pos'],
+			// 	template: `
+			// 	<div :style="getGridArea(0)">
+      //   <img
+      //     class="player-img"
+      //     src="Images/Cyberboy/idle-right.png"
+      //   />
+      //   <p class="display-names">AI by vue{{ pos.id }}</p>
+      // 	</div>
+			// 	`,
 
-			});
+			// });
 
 			app.mount("#game-page");
 		</script>
