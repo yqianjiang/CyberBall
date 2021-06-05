@@ -156,7 +156,6 @@ const MyGame = {
 		},
 		initPlayer00(){
 			this.$nextTick(()=>{
-				console.log("initPlayer00")
 				this.player.refs = [];
 				this.player.refs.push(this.$refs.player00);
 				this.delayMoveBall("00");
