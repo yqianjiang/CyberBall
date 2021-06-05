@@ -1,29 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hans">
 	<head>
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>CyberBall</title>
 		<link rel="stylesheet" href="styles/game.css" />
+		<link rel="stylesheet" href="styles/player.css" />
 		<style>
-			h2 {
-				margin: 0 auto;
-			}
-
 			[v-cloak] {
 				display: none !important;
 			}
 
-			/* 固定在右上角的菜单选项按钮 */
-			#menu-btn {
+			/* 包裹游戏页面中的主要内容 */
+			#game-page {
+				width: 100%;
+				display: grid;
+				grid-template-rows: 1fr 2fr 0.4fr;
+				justify-items: center;
+				align-items: center;
+				text-align: center;
+			}
+
+			/* 页面的共同设置 */
+			.main-page,
+			.pre-begin-page {
+				width: inherit;
+				height: 100%;
+			}
+
+			.pre-begin-page {
+				display: flex;
+				flex-direction: column;
+				row-gap: 2rem;
+			}
+		</style>
+		<style>
+			/* 其他小元件.css */
+			.ball {
 				position: absolute;
 				top: 0;
-				right: 0;
+				left: 0;
+				width: 2rem;
 			}
-			#menu-btn > button {
-				width: 4rem;
-				font-size: 0.8rem;
+
+			#input-name {
+				width: 5rem;
+				font-size: smaller;
 			}
 
 			/* #menu-wrap {
@@ -41,79 +64,6 @@
 				max-width: 50rem;
 				height: inherit;
 			} */
-
-			/* 包裹游戏页面中的主要内容 */
-			#game-page {
-				width: 100%;
-				display: grid;
-				text-align: center;
-				justify-items: center;
-				align-items: center;
-			}
-
-			/* 页面的共同设置 */
-			.main-page,
-			.pre-begin-page {
-				width: inherit;
-				height: 100%;
-			}
-
-			.ball {
-				position: absolute;
-				top: 0;
-				left: 0;
-				width: 2rem;
-			}
-
-			/* 包裹游戏主界面中所有players的div */
-			.players-wrap {
-				display: grid;
-				grid-template-columns: 1fr 1fr 1fr;
-				grid-template-rows: 1fr;
-			}
-
-			/* 放单个player图片、球球、名字的盒子（类似container） */
-			.player-icon {
-				width: 6rem;
-				margin: 6vh auto 2vh;
-			}
-
-			.player-img {
-				width: 100%;
-			}
-
-			/* .display-names {
-				position: relative;
-				top: -2rem;
-			} */
-
-			/* 在player头顶占坑（用于排版players位置） */
-			.down {
-				margin-top: 20vh;
-			}
-
-			.player-name > input {
-				width: 5rem;
-				font-size: smaller;
-			}
-
-			.row {
-				display: flex;
-				align-items: flex-end;
-				justify-content: center;
-			}
-
-			.btn-wrap {
-				margin-top: 5vh;
-			}
-
-			.player-leftWard {
-				transform: scale(-1, 1);
-			}
-
-			.player-rightWard {
-				transform: scale(1, 1);
-			}
 		</style>
 	</head>
 	<body>
@@ -122,229 +72,107 @@
 				<div id="game-page" v-cloak>
 					<h1>CyberBall</h1>
 					<!-- page-1 -->
-					<div class="pre-begin-page" v-if="isShow.pre">
-						<div class="player-name">
-							昵称：<input
+					<div class="pre-begin-page" v-show="isShow.pre">
+						<div class="input-name-wrap">
+							<label for="input-name">昵称：</label>
+							<input
 								type="text"
 								placeholder="请输入昵称"
-								v-model="player.name"
+								id="input-name"
+								v-model="player.name[0]"
 							/>
 						</div>
-						<div class="player-icon">
+						<div class="single-player-wrap">
 							<img
 								ref="player00"
 								class="player-img"
 								src="Images/Cyberboy/idle-right.png"
-								width="100%"
-								:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[0]}deg) grayscale(${player.grays[0]}%);`"
+								:style="playerStyle[0]"
 							/>
 						</div>
-						<div class="color-option">
+						<div class="input-color-wrap">
 							<div class="row">
-								色调：<input
+								<label for="input-hue">色调：</label>
+								<input
 									class="color-bar"
 									type="range"
 									max="360"
-									v-model="player.hues[0]"
+									id="input-hue"
+									v-model="player.hue"
 								/>
 							</div>
 							<div class="row">
-								灰度：<input
+								<label for="input-gray">灰度：</label>
+								<input
 									class="color-bar"
 									type="range"
-									v-model="player.grays[0]"
+									id="input-gray"
+									v-model="player.gray"
 								/>
 							</div>
 						</div>
 						<div class="btn-wrap">
-							<button @click="enterGame">进入游戏</button>
+							<button @click="goNextPage">下一步</button>
 						</div>
 					</div>
 
 					<!-- page-2 -->
-					<div class="main-page" v-if="isShow.main">
-						<h2>游戏正在开发中，敬请期待 :)</h2>
-						<div class="players-wrap">
-							<!-- player的模版 -->
-							<div class="player-icon">
-								<img
-									ref="player1"
-									class="player-img"
-									src="Images/Cyberboy/idle-right.png"
-									width="100%"
-									:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[1]}deg) grayscale(${player.grays[1]}%);`"
-									@click="moveBall(1)"
-									@mouseover="playerTurn('left')"
-								/>
-								<p class="display-names">AI1</p>
+					<div class="main-page" v-show="isShow.main || isShow.next">
+						<label v-show="isShow.next">
+							请选择玩家数量：
+							<input
+								type="number"
+								v-model="player.numInput"
+								value="3"
+								min="3"
+								max="9"
+							/>
+						</label>
+						<div class="players-wrap" @mousemove="playerTurn">
+							
+							<!-- v-for -->
+							<div
+							:style="position"
+							v-for="(position, idx) in gridArea"
+							:key="idx"
+						>
+							<img
+								class="player-img"
+								:class="player.isLeftWard[idx]? 'player-leftWard': 'player-rightWard'"
+								:ref = "setPlayerRef"
+								src="Images/Cyberboy/idle-right.png"
+								:style="playerStyle[idx]"
+								@click="userMoveBall(idx)"
+							/>
+							<p class="display-names">{{ player.name[idx] }}</p>
 							</div>
-
-							<div class="player-icon">
-								<img
-									ref="player0"
-									class="player-img down"
-									:class="player.isLeftWard? 'player-leftWard': 'player-rightWard'"
-									src="Images/Cyberboy/idle-right.png"
-									width="100%"
-									:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[0]}deg) grayscale(${player.grays[0]}%); transition:${player.turnDur}s linear`"
-								/>
-								<p class="display-names">{{ player.name }}</p>
-							</div>
-
-							<div class="player-icon">
-								<img
-									ref="player2"
-									class="player-img player-leftWard"
-									src="Images/Cyberboy/idle-right.png"
-									width="100%"
-									:style="`filter: sepia(1) saturate(20) hue-rotate(${player.hues[2]}deg) grayscale(${player.grays[2]}%)`"
-									@click="moveBall(2, undefined, 0)"
-									@mouseover="playerTurn('right')"
-								/>
-								<p class="display-names">AI2</p>
-							</div>
+						</div>	
+					
+						<div class="btn-wrap">
+							<button @click="enterGame">开始游戏</button>
 						</div>
+					
 					</div>
-
+					
+					
 					<!-- 球 -->
 					<img
 						class="ball"
 						src="Images/ball.png"
-						:style="`transform:translate(${ball.pos[0]}vw, ${ball.pos[1]}rem); transition: ${ball.moveDur}s linear`"
+						:style="ballStyle"
 					/>
 
 					<!-- 菜单 -->
 					<div id="menu-btn">
 						<button @click="openMenu">返回</button>
 					</div>
-					<div id="menu-wrap" v-if="isShow.menu">
+					<div id="menu-wrap" v-show="isShow.menu">
 						<!-- <div class="menu"></div> -->
 					</div>
 				</div>
 			</div>
 		</div>
 		<script src="script/vue.global.prod.js"></script>
-		<script>
-			// rem
-			let fontSize = 16;
-			const BALL_DX = 67;
-			const BALL_DY = 5;
-			const LOAD_DELAY = 10;
-
-			const delay = function delayCallFn(fn, delayTime) {
-				return function (...args) {
-					let timer = setTimeout(() => {
-						fn(...args);
-					}, delayTime);
-				};
-			};
-
-			const MyGame = {
-				data() {
-					return {
-						// 控制刚加载页面时，各子页面的显示/隐藏
-						isShow: {
-							pre: true,
-							main: false,
-							menu: false,
-						},
-						player: {
-							name: "",
-							isLeftWard: false,
-							turnDur: 0.5,
-							// [0]为当前玩家的初始值，后面是其他玩家的随机值
-							hues: [180, Math.random() * 360, Math.random() * 360],
-							grays: [0, Math.random() * 70, Math.random() * 100],
-						},
-						ball: {
-							pos: [0, 0],
-							moveDur: 0,
-							owner: "player0",
-							receptor: "player0",
-						},
-					};
-				},
-				methods: {
-					checkInput(){
-						let name = this.player.name;
-						if(!name) {
-							alert("请输入昵称！");
-							return -1;
-						} else if (name.length > 10) {
-							alert("名字太长了！");
-							return -1;
-						}
-					},
-					togglePage(ballOwnerId) {
-						this.isShow.pre = !this.isShow.pre;
-						this.isShow.main = !this.isShow.main;
-						if (this.isShow.main) {
-							this.player.isLeftWard = false;
-						}
-						this.delayMoveBall(ballOwnerId);
-					},
-					enterGame() {
-						// if(this.checkInput()) return 0;
-						this.togglePage(0);
-					},
-					openMenu() {
-						if (this.isShow.pre) {
-							location = "index.html";
-						}
-						if (this.isShow.main) {
-							// this.isShow.menu = true;
-							this.togglePage("00");
-						}
-					},
-					getTargetPos(dx) {
-						let ballReceptor = this.$refs[this.ball.receptor];
-						if (!ballReceptor) return this.ball.pos;
-						let scalingSize = window.innerWidth / 100;
-						let posX = (ballReceptor.offsetLeft + dx) / scalingSize;
-						let posY = (ballReceptor.offsetTop - BALL_DY) / fontSize;
-						return [posX, posY];
-					},
-					moveBall(receptorId = 0, ballMoveDur = 0.5, dx = BALL_DX) {
-						// 设置移动参数
-						this.ball.moveDur = ballMoveDur;
-						this.ball.receptor = "player" + receptorId;
-						// 移动
-						if (this.ball.receptor == this.ball.owner) return -1;
-						this.ball.pos = this.getTargetPos(dx);
-						this.ball.owner = this.ball.receptor;
-					},
-					delayMoveBall(receptorId, ballMoveDur = 0) {
-						let moveBall = delay(this.moveBall, LOAD_DELAY);
-						moveBall(receptorId, ballMoveDur);
-					},
-					playerTurn(direction) {
-						let turnLeft = direction == "left";
-						if (turnLeft == this.player.isLeftWard) return -1;
-						this.player.isLeftWard = turnLeft;
-
-						if (this.ball.owner !== "player0") return -1;
-						// 移动球
-						const moveBall = (dx) => {
-							this.ball.pos[0] += dx / (window.innerWidth / 100);
-						};
-
-						this.ball.moveDur = this.player.turnDur;
-						if (turnLeft) moveBall(-BALL_DX);
-						else moveBall(BALL_DX);
-					},
-				},
-
-				mounted() {
-					this.delayMoveBall("00");
-
-					// Safari的filter+transition有问题，取消player_turn的动画
-					if (navigator.userAgent.includes("AppleWebKit/6")) {
-						this.player.turnDur = 0;
-					}
-				},
-			};
-
-			myGame = Vue.createApp(MyGame).mount("#game-page");
-		</script>
+		<script src="script/main.js"></script>
 	</body>
 </html>

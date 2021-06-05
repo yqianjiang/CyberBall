@@ -1,0 +1,34 @@
+/* 包裹游戏主界面中所有players的div */
+.players-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  align-items: center;
+}
+
+.players-wrap div:first-child {
+  grid-area: 2 / 1;
+}
+
+/* 用于排版players位置） */
+.player-down {
+  grid-area: 3 / 2 / auto / 4;
+}
+
+/* 用于排版players位置） */
+.player-right {
+  grid-area: 2 / 4;
+}
+
+.player-img {
+  width: 6rem;
+}
+
+.player-leftWard {
+  transform: scale(-1, 1);
+}
+
+.player-rightWard {
+  transform: scale(1, 1);
+}
+
