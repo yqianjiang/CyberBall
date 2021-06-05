@@ -127,13 +127,13 @@ const MyGame = {
 			}
 		},
 		checkInput() {
-			let name = this.player.name;
+			let name = this.player.name[0];
 			if (!name) {
 				alert("请输入昵称！");
-				return -1;
+				return true;
 			} else if (name.length > 10) {
 				alert("名字太长了！");
-				return -1;
+				return true;
 			}
 		},
 		togglePage(pre, next) {
@@ -141,18 +141,16 @@ const MyGame = {
 				this.isShow[next],
 				this.isShow[pre],
 			];
-			if (this.isShow.main) {
-				this.player.isLeftWard[0] = false;
-				this.player.isLeftWard[3] = false;
-			}
 		},
 		enterGame() {
 			this.togglePage("next", "main");
 			this.delayMoveBall(0);
 		},
 		goNextPage() {
-			this.togglePage("pre", "next");
-			this.delayMoveBall(0);
+			if (!this.checkInput()) {
+				this.togglePage("pre", "next");
+				this.delayMoveBall(0);
+			}
 		},
 		openMenu() {
 			if (this.isShow.pre) {
