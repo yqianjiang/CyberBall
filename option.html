@@ -27,6 +27,18 @@
 			<div class="canvas-wrap">
 				<div id="game-page">
 					<h1>CyberBall</h1>
+
+					<label>
+						请选择玩家数量：
+						<input
+							type="number"
+							v-model="player.numInput"
+							value="3"
+							min="3"
+							max="9"
+						/>
+					</label>
+
 					<div class="players-wrap">
 						<div
 							:style="position"
@@ -40,20 +52,21 @@
 							/>
 							<p class="display-names">{{ playerName[idx] }}</p>
 						</div>
+					
+					
 					</div>
-					<label>
-						请输入玩家数量：
-						<input
-							type="number"
-							v-model="player.numInput"
-							value="3"
-							min="3"
-							max="9"
-						/>
-					</label>
+
+					<div>
+						<button @click="saveConfig">保存设置</button>
+					</div>
+
+					<div id="menu-btn">
+						<button @click="openMenu">返回</button>
+					</div>
 				</div>
 			</div>
 		</div>
+
 
 		<script src="script/vue.global.prod.js"></script>
 		<script>
@@ -145,8 +158,16 @@
 							this.player.numInput = this.player.num;
 						}
 					},
+					openMenu(){
+						location='index.html'
+					},
+					saveConfig(){
+
+						this.openMenu();
+					}
 				},
 			});
+
 
 			app.mount("#game-page");
 		</script>

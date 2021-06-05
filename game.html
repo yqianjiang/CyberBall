@@ -72,14 +72,14 @@
 				<div id="game-page" v-cloak>
 					<h1>CyberBall</h1>
 					<!-- page-1 -->
-					<div class="pre-begin-page" v-if="isShow.pre">
+					<div class="pre-begin-page" v-show="isShow.pre">
 						<div class="input-name-wrap">
 							<label for="input-name">昵称：</label>
 							<input
 								type="text"
 								placeholder="请输入昵称"
 								id="input-name"
-								v-model="player.name"
+								v-model="player.name[0]"
 							/>
 						</div>
 						<div class="single-player-wrap">
@@ -87,7 +87,7 @@
 								ref="player00"
 								class="player-img"
 								src="Images/Cyberboy/idle-right.png"
-								:style="playerColor[0]"
+								:style="playerStyle[0]"
 							/>
 						</div>
 						<div class="input-color-wrap">
@@ -112,55 +112,49 @@
 							</div>
 						</div>
 						<div class="btn-wrap">
-							<button @click="enterGame">进入游戏</button>
+							<button @click="goNextPage">下一步</button>
 						</div>
 					</div>
 
 					<!-- page-2 -->
-					<div class="main-page" v-if="isShow.main">
-						<h2>游戏正在开发中，敬请期待 :)</h2>
-						<div class="players-wrap">
+					<div class="main-page" v-show="isShow.main || isShow.next">
+						<label v-show="isShow.next">
+							请选择玩家数量：
+							<input
+								type="number"
+								v-model="player.numInput"
+								value="3"
+								min="3"
+								max="9"
+							/>
+						</label>
+						<div class="players-wrap" @mousemove="playerTurn">
+							
 							<!-- v-for -->
-							<div class="single-player-wrap">
-								<img
-									class="player-img"
-									id="player1"
-									ref="player1"
-									src="Images/Cyberboy/idle-right.png"
-									:style="playerColor[1]"
-									@click="moveBall(1)"
-									@mouseover="playerTurn('left')"
-								/>
-								<p class="display-names">AI1</p>
+							<div
+							:style="position"
+							v-for="(position, idx) in gridArea"
+							:key="idx"
+						>
+							<img
+								class="player-img"
+								:class="player.isLeftWard[idx]? 'player-leftWard': 'player-rightWard'"
+								:ref = "setPlayerRef"
+								src="Images/Cyberboy/idle-right.png"
+								:style="playerStyle[idx]"
+								@click="userMoveBall(idx)"
+							/>
+							<p class="display-names">{{ player.name[idx] }}</p>
 							</div>
-
-							<div class="single-player-wrap player-down">
-								<img
-									class="player-img"
-									:class="player.isLeftWard? 'player-leftWard': 'player-rightWard'"
-									id="player0"
-									ref="player0"
-									src="Images/Cyberboy/idle-right.png"
-									:style="playerStyle"
-								/>
-								<p class="display-names">{{ player.name }}</p>
-							</div>
-
-							<div class="single-player-wrap player-right">
-								<img
-									class="player-img player-leftWard"
-									id="player2"
-									ref="player2"
-									src="Images/Cyberboy/idle-right.png"
-									:style="playerColor[2]"
-									@click="moveBall(2, undefined, 0)"
-									@mouseover="playerTurn('right')"
-								/>
-								<p class="display-names">AI2</p>
-							</div>
+						</div>	
+					
+						<div class="btn-wrap">
+							<button @click="enterGame">开始游戏</button>
 						</div>
+					
 					</div>
-
+					
+					
 					<!-- 球 -->
 					<img
 						class="ball"
@@ -172,7 +166,7 @@
 					<div id="menu-btn">
 						<button @click="openMenu">返回</button>
 					</div>
-					<div id="menu-wrap" v-if="isShow.menu">
+					<div id="menu-wrap" v-show="isShow.menu">
 						<!-- <div class="menu"></div> -->
 					</div>
 				</div>
