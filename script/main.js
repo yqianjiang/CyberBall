@@ -22,7 +22,18 @@ const MyGame = {
 				hue: 180,
 				gray: 0,
 				name: ["", "1", "2", 3, 4, 5, 6, 7, "8"],
-				isLeftWard: [false, false, true, false, true, true, false, true, false, true],
+				isLeftWard: [
+					false,
+					false,
+					true,
+					false,
+					true,
+					true,
+					false,
+					true,
+					false,
+					true,
+				],
 				refs: [],
 				rect: {
 					mode1: [
@@ -68,9 +79,12 @@ const MyGame = {
 	},
 	computed: {
 		playerStyle() {
-			const getStyleStr = (hue, gray, turnDur) => `filter: ${this.player.filter} hue-rotate(${hue}deg) grayscale(${gray}%); transition:${turnDur}s linear`;
+			const getStyleStr = (hue, gray, turnDur) =>
+				`filter: ${this.player.filter} hue-rotate(${hue}deg) grayscale(${gray}%); transition:${turnDur}s linear`;
 
-			let newList = [getStyleStr(this.player.hue, this.player.gray, this.player.turnDur)];
+			let newList = [
+				getStyleStr(this.player.hue, this.player.gray, this.player.turnDur),
+			];
 
 			for (let i = 1; i < this.player.num; i++) {
 				newList.push(getStyleStr(Math.random() * 360, Math.random() * 100, 0));
@@ -82,35 +96,31 @@ const MyGame = {
 			return `transform:translate(${this.ball.pos[0]}vw, ${this.ball.pos[1]}rem); transition: ${this.ball.moveDur}s linear`;
 		},
 		gridArea() {
+			let getGridArea = (i) => {
+				if (this.player.modeMap[this.player.num].includes(i)) {
+					return `grid-area: ${this.player.rect.mode2[i]}`;
+				} else {
+					return `grid-area: ${this.player.rect.mode1[i]}`;
+				}
+			};
+
 			let newList = [];
 			for (let i = 0; i < this.player.num; i++) {
-				newList.push(this.getGridArea(i));
+				newList.push(getGridArea(i));
 			}
 			return newList;
 		},
 	},
 	methods: {
-		setPlayerRef(refItem){
-			if(refItem){
+		setPlayerRef(refItem) {
+			if (refItem) {
 				this.player.refs.push(refItem);
-			}
-		},
-		isGridMode2() {
-			if (this.player.num in this.player.modeMap) {
-				return this.player.modeMap[this.player.num];
-			}
-		},
-		getGridArea(i) {
-			if (this.isGridMode2().includes(i)) {
-				return `grid-area: ${this.player.rect.mode2[i]}`;
-			} else {
-				return `grid-area: ${this.player.rect.mode1[i]}`;
 			}
 		},
 		checkPlayerNum() {
 			if (this.player.numInput in this.player.modeMap) {
 				this.player.num = this.player.numInput;
-					this.reactiveBallPos()
+				this.reactiveBallPos();
 			} else if (this.player.numInput !== "") {
 				alert("请输入3-9之间的数值！");
 				this.player.numInput = this.player.num;
@@ -127,18 +137,21 @@ const MyGame = {
 			}
 		},
 		togglePage(pre, next) {
-			[this.isShow[pre], this.isShow[next]] = [this.isShow[next], this.isShow[pre]];
+			[this.isShow[pre], this.isShow[next]] = [
+				this.isShow[next],
+				this.isShow[pre],
+			];
 			if (this.isShow.main) {
 				this.player.isLeftWard[0] = false;
 				this.player.isLeftWard[3] = false;
 			}
 		},
 		enterGame() {
-			this.togglePage('next', 'main');
+			this.togglePage("next", "main");
 			this.delayMoveBall(0);
 		},
-		goNextPage(){
-			this.togglePage('pre', 'next');
+		goNextPage() {
+			this.togglePage("pre", "next");
 			this.delayMoveBall(0);
 		},
 		openMenu() {
@@ -146,29 +159,28 @@ const MyGame = {
 				location = "index.html";
 			}
 			if (this.isShow.next) {
-				this.togglePage('pre', 'next');
+				this.togglePage("pre", "next");
 				this.initPlayer00();
-			}			
+			}
 			if (this.isShow.main) {
-				this.togglePage('main', 'next');
+				this.togglePage("main", "next");
 				this.delayMoveBall(0);
 			}
 		},
-		initPlayer00(){
-			this.$nextTick(()=>{
+		initPlayer00() {
+			this.$nextTick(() => {
 				this.player.refs = [];
 				this.player.refs.push(this.$refs.player00);
 				this.delayMoveBall("00");
-			})
+			});
 		},
-		chooseBallReceptor(){
+		chooseBallReceptor() {
 			// preferenceMatrix (0,0) (0,1) ... 对角线为0 【原始的为9*9，但player出发的其实不用管】【随着
-
 		},
 		getTargetPos(dx) {
 			let ballReceptor = this.player.refs[this.ball.receptor];
 			if (!ballReceptor) {
-				console.log("reference error!")
+				console.log("reference error!");
 				return this.ball.pos;
 			}
 			let posX = (ballReceptor.offsetLeft + dx) / (window.innerWidth / 100);
@@ -177,36 +189,37 @@ const MyGame = {
 		},
 		userMoveBall(idx) {
 			// 只有当[用户持有球]且[处于游戏界面]的时候，按钮才起效果
-			if (this.ball.owner==1 && this.isShow.main){
-				this.moveBall(idx)
+			if (this.ball.owner == 1 && this.isShow.main) {
+				this.moveBall(idx);
 			}
 		},
-		reactiveBallPos(){
-			this.$nextTick(()=>{
+		reactiveBallPos() {
+			this.$nextTick(() => {
 				// 从自身移动到自身，不改变ball owner的值
 				let idx = this.ball.owner;
 				let dx = BALL_DX;
-				if (this.player.isLeftWard[idx-1]) {
-					dx = 0
+				if (this.player.isLeftWard[idx - 1]) {
+					dx = 0;
 				}
 				this.ball.moveDur = 0;
 				this.ball.pos = this.getTargetPos(dx);
-			})
+			});
 		},
-		moveBall(receptorId= 0, ballMoveDur = 0.5) {
+		moveBall(receptorId = 0, ballMoveDur = 0.5) {
 			// 设置移动参数
 			let dx = BALL_DX;
 			if (this.player.isLeftWard[receptorId]) {
-				dx = 0
+				dx = 0;
 			}
 			this.ball.moveDur = ballMoveDur;
-			if (receptorId==="00"){
+			if (receptorId === "00") {
 				this.ball.receptor = 0;
 			} else {
 				this.ball.receptor = receptorId + 1;
 			}
 			// 移动
-			if (this.ball.receptor == this.ball.owner) return "don't need to move the ball";
+			if (this.ball.receptor == this.ball.owner)
+				return "don't need to move the ball";
 			this.ball.pos = this.getTargetPos(dx);
 			this.ball.owner = this.ball.receptor;
 		},
@@ -216,7 +229,7 @@ const MyGame = {
 		},
 		playerTurn(e) {
 			const x = e.clientX;
-			x < window.innerWidth/2? direction = "left": direction = "right";
+			x < window.innerWidth / 2 ? (direction = "left") : (direction = "right");
 			let turnLeft = direction == "left";
 			if (turnLeft == this.player.isLeftWard[0]) return -1;
 			this.player.isLeftWard[0] = turnLeft;
@@ -238,7 +251,7 @@ const MyGame = {
 		if (this.player.num != this.player.numInput) {
 			this.checkPlayerNum();
 		}
-		while (this.player.refs.length > parseInt(this.player.num)+1) {
+		while (this.player.refs.length > parseInt(this.player.num) + 1) {
 			this.player.refs.splice(0, 1);
 		}
 	},
@@ -256,6 +269,10 @@ const MyGame = {
 myGame = Vue.createApp(MyGame).mount("#game-page");
 
 // 球的位置响应式：当窗口大小改变时，重新获取一下球的位置
-window.addEventListener('resize', ()=>{
-	myGame.reactiveBallPos()
-}, false)
+window.addEventListener(
+	"resize",
+	() => {
+		myGame.reactiveBallPos();
+	},
+	false
+);
