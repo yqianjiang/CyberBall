@@ -2,7 +2,6 @@
 let fontSize = 16;
 const BALL_DX = 67;
 const BALL_DY = 5;
-const LOAD_DELAY = 1000;
 
 const MyGame = {
 	data() {
@@ -82,7 +81,7 @@ const MyGame = {
 			const getStyleStr = (hue, gray, turnDur) =>
 				`filter: ${this.player.filter} hue-rotate(${hue}deg) grayscale(${gray}%); transition:${turnDur}s linear`;
 
-			let newList = [
+			const newList = [
 				getStyleStr(this.player.hue, this.player.gray, this.player.turnDur),
 			];
 
@@ -96,7 +95,7 @@ const MyGame = {
 			return `transform:translate(${this.ball.pos[0]}vw, ${this.ball.pos[1]}rem); transition: ${this.ball.moveDur}s linear`;
 		},
 		gridArea() {
-			let getGridArea = (i) => {
+			const getGridArea = (i) => {
 				if (this.player.modeMap[this.player.num].includes(i)) {
 					return `grid-area: ${this.player.rect.mode2[i]}`;
 				} else {
@@ -104,7 +103,7 @@ const MyGame = {
 				}
 			};
 
-			let newList = [];
+			const newList = [];
 			for (let i = 0; i < this.player.num; i++) {
 				newList.push(getGridArea(i));
 			}
@@ -126,7 +125,8 @@ const MyGame = {
 				this.player.numInput = this.player.num;
 			}
 		},
-		checkInput() {
+		checkNameInput() {
+			return false;
 			let name = this.player.name[0];
 			if (!name) {
 				alert("请输入昵称！");
@@ -147,7 +147,7 @@ const MyGame = {
 			this.delayMoveBall(0);
 		},
 		goNextPage() {
-			if (!this.checkInput()) {
+			if (!this.checkNameInput()) {
 				this.togglePage("pre", "next");
 				this.delayMoveBall(0);
 			}
@@ -176,7 +176,7 @@ const MyGame = {
 			// preferenceMatrix (0,0) (0,1) ... 对角线为0 【原始的为9*9，但player出发的其实不用管】【随着
 		},
 		getTargetPos(dx) {
-			let ballReceptor = this.player.refs[this.ball.receptor];
+			const ballReceptor = this.player.refs[this.ball.receptor];
 			if (!ballReceptor) {
 				console.log("reference error!");
 				return this.ball.pos;
@@ -194,9 +194,8 @@ const MyGame = {
 		reactiveBallPos() {
 			this.$nextTick(() => {
 				// 从自身移动到自身，不改变ball owner的值
-				let idx = this.ball.owner;
 				let dx = BALL_DX;
-				if (this.player.isLeftWard[idx - 1]) {
+				if (this.player.isLeftWard[this.ball.owner - 1]) {
 					dx = 0;
 				}
 				this.ball.moveDur = 0;
@@ -228,7 +227,7 @@ const MyGame = {
 		playerTurn(e) {
 			const x = e.clientX;
 			x < window.innerWidth / 2 ? (direction = "left") : (direction = "right");
-			let turnLeft = direction == "left";
+			const turnLeft = direction == "left";
 			if (turnLeft == this.player.isLeftWard[0]) return -1;
 			this.player.isLeftWard[0] = turnLeft;
 			// this.player.isLeftWard[3] = turnLeft;
