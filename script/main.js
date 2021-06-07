@@ -2,6 +2,7 @@
 let fontSize = 16;
 const BALL_DX = 67;
 const BALL_DY = 5;
+const AI_DELAY_T = 1500;
 
 const MyGame = {
 	data() {
@@ -173,17 +174,43 @@ const MyGame = {
 			});
 		},
 		chooseBallReceptor() {
-			// preferenceMatrix (0,0) (0,1) ... 对角线为0 【原始的为9*9，但player出发的其实不用管】【随着
+			// 根据当前的ball.owner，返回目标的ball.receptor的id。
+			let receptorId = -1;
+			let drawProb = [];
+
+			// [step1]初始化preferenceMatrix 【n*n】 (0,0) (0,1) ... 对角线为0，第0行表示从player出发的（可以忽略）
+			const preferenceMatrix = ((n) => {
+				const matrix = [];
+				for (let i = 0; i < n; i++) {
+					matrix.push([]);
+					for (let j=0; j<n; j++){
+						if (i == j) {
+							matrix[i].push(0)
+						} else {
+							matrix[i].push(1 / (n - 1))
+						}
+					}
+				}
+				return matrix;
+			})(this.player.num);
+
+			// [step2]根据概率判断。第i名玩家的选择概率为 preferenceMatrix[i]
+			// 每人获得一个随机数，再乘以每人的概率，对比谁比较大
+			drawProb = preferenceMatrix[this.ball.owner - 1].map(
+				x => x * Math.random()
+			);
+			receptorId = drawProb.indexOf(Math.max(...drawProb));
+			return receptorId;
 		},
-		getTargetPos(dx) {
-			const ballReceptor = this.player.refs[this.ball.receptor];
-			if (!ballReceptor) {
-				console.log("reference error!");
-				return this.ball.pos;
-			}
-			let posX = (ballReceptor.offsetLeft + dx) / (window.innerWidth / 100);
-			let posY = (ballReceptor.offsetTop - BALL_DY) / fontSize;
-			return [posX, posY];
+		async aiMoveBall() {
+			if (!this.isShow.main) return "ai not active";
+			let receptorId = this.chooseBallReceptor();
+			await new Promise((resolve) => {
+				setTimeout(() => {
+					resolve();
+				}, AI_DELAY_T);
+			});
+			this.moveBall(receptorId);
 		},
 		userMoveBall(idx) {
 			// 只有当[用户持有球]且[处于游戏界面]的时候，按钮才起效果
@@ -202,6 +229,10 @@ const MyGame = {
 				this.ball.pos = this.getTargetPos(dx);
 			});
 		},
+		delayMoveBall(receptorId, ballMoveDur = 0) {
+			this.moveBall(receptorId, ballMoveDur);
+			this.reactiveBallPos();
+		},
 		moveBall(receptorId = 0, ballMoveDur = 0.5) {
 			// 设置移动参数
 			let dx = BALL_DX;
@@ -219,14 +250,29 @@ const MyGame = {
 				return "don't need to move the ball";
 			this.ball.pos = this.getTargetPos(dx);
 			this.ball.owner = this.ball.receptor;
+
+			// 如果球到其他玩家手中，执行一个判断...
+			if (this.ball.owner > 1) {
+				this.aiMoveBall();
+			}
 		},
-		delayMoveBall(receptorId, ballMoveDur = 0) {
-			this.moveBall(receptorId, ballMoveDur);
-			this.reactiveBallPos();
+		getTargetPos(dx) {
+			const ballReceptor = this.player.refs[this.ball.receptor];
+			if (!ballReceptor) {
+				console.log("reference error!");
+				return this.ball.pos;
+			}
+			let posX = (ballReceptor.offsetLeft + dx) / (window.innerWidth / 100);
+			let posY = (ballReceptor.offsetTop - BALL_DY) / fontSize;
+			return [posX, posY];
 		},
+
 		playerTurn(e) {
+			// 挂在"players-wrap"中，根据鼠标位置的x坐标，让人物控制的玩家转向跟随鼠标
 			const x = e.clientX;
-			x < window.innerWidth / 2 ? (direction = "left") : (direction = "right");
+			x < this.player.refs[1].offsetLeft
+				? (direction = "left")
+				: (direction = "right");
 			const turnLeft = direction == "left";
 			if (turnLeft == this.player.isLeftWard[0]) return -1;
 			this.player.isLeftWard[0] = turnLeft;
