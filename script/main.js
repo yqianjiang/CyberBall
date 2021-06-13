@@ -127,7 +127,6 @@ const MyGame = {
 			}
 		},
 		checkNameInput() {
-			return false;
 			let name = this.player.name[0];
 			if (!name) {
 				alert("请输入昵称！");
