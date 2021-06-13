@@ -3,9 +3,40 @@
 [中文](./README_zh.md)
 
 
-An online ball-tossing game inspired by the Cyberball experimental paradigm (Williams et al., 2000) [^1] for research on social exclusion, ostracism, etc.
+An online ball-tossing game inspired by the Cyberball experimental paradigm (Williams et al., 2000) for research on social exclusion, ostracism, etc.
 
 The number of players in the game is 3-9. When you get the ball, you can choose who to throw it to.
+
+
+
+### Project Structure
+
+```js
+├── main.js                    
+├── App.vue                    
+├── images                     
+│   ├── Ball.png
+│   └── Cyberboy
+│        └── idle-right.png
+│
+├── components                 
+│   ├── Ball.vue               
+│   ├── NavButton.vue          
+│   ├── Player.vue     				 
+│   └── PlayerImg.vue  				 
+│
+├── views                      
+│   ├── Home.vue               
+│   ├── Game.vue               
+│   └── PreGame.vue
+│
+├── router/index.js            
+└── stores/index.js             
+```
+
+
+
+
 
 
 
