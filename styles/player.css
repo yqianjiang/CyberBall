@@ -6,20 +6,6 @@
   align-items: center;
 }
 
-.players-wrap div:first-child {
-  grid-area: 2 / 1;
-}
-
-/* 用于排版players位置） */
-.player-down {
-  grid-area: 3 / 2 / auto / 4;
-}
-
-/* 用于排版players位置） */
-.player-right {
-  grid-area: 2 / 4;
-}
-
 .player-img {
   width: 6rem;
 }
