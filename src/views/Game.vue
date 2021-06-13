@@ -144,12 +144,11 @@ export default {
 	},
 	methods: {
 		loadConfigs() {
-			this.player.name[0] = this.$store.state.playerName;
-			this.player.hue = this.$store.state.playerHue;
-			this.player.gray = this.$store.state.playerGray;
-			this.player.num = this.$store.state.playerNum;
+			this.player.name[0] = this.$store.getters.playerName || this.player.name[0];
+			this.player.hue = this.$store.getters.playerHue || this.player.hue;
+			this.player.gray = this.$store.getters.playerGray || this.player.gray;
+			this.player.num = this.$store.getters.playerNum || this.player.num;
 		},
-
 		// player相关
 		setPlayerRef(refItem) {
 			if (refItem) {

@@ -40,6 +40,10 @@
 				<input type="number" v-model="playerNumInput" min="3" max="9" />
 			</label>
 			<div>
+				<input type="checkbox" id="cbox1" v-model="isStore" />
+				<label for="cbox1">记住我的选项</label>
+			</div>
+			<div>
 				<button @click="onSummit">开始游戏</button>
 			</div>
 		</div>
@@ -65,6 +69,7 @@ export default {
 			playerGray: 0,
 			playerNumInput: 4,
 			playerNum: 4,
+			isStore: false,
 		};
 	},
 	computed: {
@@ -74,16 +79,18 @@ export default {
 	},
 	methods: {
 		saveConfigs() {
+			this.$store.commit("setLocalStorage", this.isStore);
 			this.$store.commit("setPlayerName", this.playerName);
 			this.$store.commit("setPlayerHue", this.playerHue);
 			this.$store.commit("setPlayerGray", this.playerGray);
 			this.$store.commit("setPlayerNum", this.playerNum);
 		},
 		loadConfigs() {
-			this.playerName = this.$store.state.playerName;
-			this.playerHue = this.$store.state.playerHue;
-			this.playerGray = this.$store.state.playerGray;
-			this.playerNumInput = this.$store.state.playerNum;
+			this.isStore = this.$store.getters.isSave;
+			this.playerName = this.$store.getters.playerName || this.playerName;
+			this.playerHue = this.$store.getters.playerHue || this.playerHue;
+			this.playerGray = this.$store.getters.playerGray || this.playerGray;
+			this.playerNumInput = this.$store.getters.playerNum || this.playerNum;
 			this.playerNum = this.playerNumInput;
 		},
 		checkNameInput() {
@@ -101,12 +108,14 @@ export default {
 			if (num > 9 || num < 3 || num % 1 !== 0) {
 				alert("请输入3-9之间的整数！");
 				this.playerNumInput = this.playerNum;
+				return false;
 			} else {
 				this.playerNum = this.playerNumInput;
+				return true;
 			}
 		},
 		onSummit() {
-			if (!this.checkNameInput()) {
+			if (!this.checkNameInput() && this.checkPlayerNum()) {
 				this.saveConfigs();
 				this.$router.push("/game");
 			}
