@@ -8,7 +8,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .ball {
 	position: absolute;
 	top: 0;

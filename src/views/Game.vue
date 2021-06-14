@@ -2,7 +2,7 @@
 	<div class="game-page">
 		<h1>CyberBall</h1>
 		<div class="main-page">
-			<div class="players-wrap" @mousemove="playerTurn">
+			<div class="players-wrap" @mousemove="onPlayerTurn">
 				<Player
 					v-for="(position, idx) in gridArea"
 					:key="idx"
@@ -11,12 +11,14 @@
 					:playerStyle="playerStyle[idx]"
 					:playerName="player.name[idx]"
 					:isLeftWard="player.isLeftWard[idx]"
-					@moveBall="userMoveBall(idx)"
+					@moveBall="onThrowBall(idx)"
 				/>
 			</div>
 		</div>
 
 		<Ball :style="ballStyle" />
+
+		<ScoreBoard :throwNum="score.throwCounts" :score="SortedScore" />
 
 		<div id="menu-btn">
 			<NavButton destination="/" text="返回" />
@@ -28,6 +30,7 @@
 import Player from "../components/Player.vue";
 import Ball from "../components/Ball.vue";
 import NavButton from "../components/NavButton.vue";
+import ScoreBoard from "../components/ScoreBoard.vue";
 
 let fontSize = 16;
 const BALL_DX = 67;
@@ -75,14 +78,18 @@ export default {
 		Player,
 		Ball,
 		NavButton,
+		ScoreBoard,
 	},
 	data() {
 		return {
+			score: {
+				throwCounts: 0,
+				playerCounts: [],
+			},
 			ball: {
 				pos: [0, 0],
 				moveDur: 0,
-				owner: 0,
-				receptor: 0,
+				owner: undefined,
 			},
 			player: {
 				num: 4,
@@ -141,10 +148,22 @@ export default {
 			}
 			return newList;
 		},
+		SortedScore() {
+			const result = [
+				{ player: undefined, value: 0 },
+				{ player: undefined, value: 0 },
+				{ player: undefined, value: 0 },
+			];
+			result[0].player = this.player.name[0];
+			result[1].player = this.player.name[1];
+			result[2].player = this.player.name[2];
+			return result;
+		},
 	},
 	methods: {
 		loadConfigs() {
-			this.player.name[0] = this.$store.getters.playerName || this.player.name[0];
+			this.player.name[0] =
+				this.$store.getters.playerName || this.player.name[0];
 			this.player.hue = this.$store.getters.playerHue || this.player.hue;
 			this.player.gray = this.$store.getters.playerGray || this.player.gray;
 			this.player.num = this.$store.getters.playerNum || this.player.num;
@@ -155,35 +174,55 @@ export default {
 				this.player.refs.push(refItem.$el.childNodes[0]);
 			}
 		},
-		playerTurn(e) {
-			// 挂在"players-wrap"中，根据鼠标位置的x坐标，让人物控制的玩家转向跟随鼠标
+		setPlayerDirection(x, idx){
+			let turnLeft;
+			if (!this.player.refs[idx]?.offsetLeft) return -1;
+			x < this.player.refs[idx].offsetLeft
+				? (turnLeft = true)
+				: (turnLeft = false);
+			if (turnLeft == this.player.isLeftWard[idx]) return -1;
+			this.player.isLeftWard[idx] = turnLeft;
+			return turnLeft
+		},
+		onPlayerTurn(e) {
+			// 根据鼠标位置的x坐标，让人物控制的玩家转向跟随鼠标
 			const x = e.clientX;
-			let direction;
-			if (!this.player.refs[0]?.offsetLeft) return -1;
-			x < this.player.refs[0].offsetLeft
-				? (direction = "left")
-				: (direction = "right");
-			const turnLeft = direction == "left";
-			if (turnLeft == this.player.isLeftWard[0]) return -1;
-			this.player.isLeftWard[0] = turnLeft;
-			// this.player.isLeftWard[3] = turnLeft;
-
-			if (this.ball.owner !== 0) return -1;
-			// 移动球
-			this.moveBallWithinPlayer(turnLeft);
+			let dx;
+			let turnLeft;
+			// 未来扩展：让其他player也可以转身，但是这样还要设置他们的this.player.turnDur
+			for (let idx of [0]){
+				turnLeft = this.setPlayerDirection(x, idx);
+	
+				// 当转身的player拥有球时，移动球
+				if (this.ball.owner == idx) {
+					turnLeft ? (dx = -BALL_DX) : (dx = BALL_DX);
+					this.shiftBallPos(dx, this.player.turnDur);
+				}
+			}
+		},
+		getPlayerPos(idx) {
+			const receptor = this.player.refs[idx];
+			if (!receptor) {
+				console.log("reference error!");
+				return [undefined, undefined];
+			}
+			return [receptor.offsetLeft, receptor.offsetTop];
+		},
+		getBallDx(idx) {
+			let dx = BALL_DX;
+			if (this.player.isLeftWard[idx]) {
+				dx = 0;
+			}
+			return dx;
 		},
 
 		// ball相关
-		moveBallWithinPlayer(turnLeft) {
-			const moveBall = (dx) => {
-				this.ball.pos[0] += dx / (window.innerWidth / 100);
-			};
-
-			this.ball.moveDur = this.player.turnDur;
-			if (turnLeft) moveBall(-BALL_DX);
-			else moveBall(BALL_DX);
+		shiftBallPos(dx, moveDur) {
+			// 根据dx值平移球的位置
+			this.ball.moveDur = moveDur;
+			this.ball.pos[0] += dx / (window.innerWidth / 100);
 		},
-		chooseBallReceptor() {
+		getBallReceptorId() {
 			// 根据当前的ball.owner，返回目标的ball.receptor的id。
 			let receptorId = -1;
 			let drawProb = [];
@@ -212,75 +251,74 @@ export default {
 			receptorId = drawProb.indexOf(Math.max(...drawProb));
 			return receptorId;
 		},
-		async aiMoveBall() {
-			let receptorId = this.chooseBallReceptor();
+		async aiThrowBall() {
+			let receptorId = this.getBallReceptorId();
 			await new Promise((resolve) => {
 				setTimeout(() => {
 					resolve();
 				}, AI_DELAY_T);
 			});
-			this.moveBall(receptorId);
+			this.throwBall(receptorId);
 		},
-		userMoveBall(idx) {
+		onThrowBall(idx) {
 			// 只有当[用户持有球]的时候，按钮才起效果
 			if (this.ball.owner == 0) {
-				this.moveBall(idx);
+				this.throwBall(idx);
 			}
 		},
-		async initBallPos() {
-			await new Promise((resolve) => {
-				setTimeout(() => {
-					resolve();
-				}, 50);
-			});
-			this.reactiveBallPos();
-		},
-		reactiveBallPos() {
-			this.$nextTick(() => {
-				// 从自身移动到自身，不改变ball owner的值
-				let dx = BALL_DX;
-				if (this.player.isLeftWard[this.ball.owner]) {
-					dx = 0;
-				}
-				this.ball.moveDur = 0;
-				this.ball.pos = this.getTargetPos(dx);
-			});
-		},
-		moveBall(receptorId = 0, ballMoveDur = 0.5) {
-			// 设置移动参数
-			let dx = BALL_DX;
-			if (this.player.isLeftWard[receptorId]) {
-				dx = 0;
-			}
+		throwBall(receptorId = 0, ballMoveDur = 0.5) {
+			// 把球从一个玩家扔到另一个玩家手中
 			this.ball.moveDur = ballMoveDur;
-			this.ball.receptor = receptorId;
-			// 移动
-			if (this.ball.receptor == this.ball.owner)
-				return "don't need to move the ball";
-			this.ball.pos = this.getTargetPos(dx);
-			this.ball.owner = this.ball.receptor;
+			if (receptorId == this.ball.owner) return "don't need to move the ball";
+			this.setBallPos(receptorId);
+			this.ball.owner = receptorId;
 
 			// 如果球到其他玩家手中，执行一个判断...
 			if (this.ball.owner > 0) {
-				this.aiMoveBall();
+				this.aiThrowBall();
 			}
 		},
-		getTargetPos(dx) {
-			const ballReceptor = this.player.refs[this.ball.receptor];
-			if (!ballReceptor) {
-				console.log("reference error!");
-				return this.ball.pos;
+		initBallPos() {
+			// 初始化球的位置：在中间
+			this.ball.pos = [
+				50 - 32 / 2 / (window.innerWidth / 100),
+				(window.innerHeight - 32) / fontSize / 2,
+			];
+		},
+		// async delayUpdateBallPos(){
+		// 	for (let i = 0; i < 3; i++) {
+		// 		await new Promise((resolve) => {
+		// 			setTimeout(() => {
+		// 				resolve();
+		// 			}, 50);
+		// 		});
+		// 		this.updateBallPos();
+		// 	}
+		// },
+		updateBallPos() {
+			// 根据窗口变化更新球的位置
+			this.ball.moveDur = 0;
+			if (!this.ball.owner) {
+				this.initBallPos();
 			}
-			let posX = (ballReceptor.offsetLeft + dx) / (window.innerWidth / 100);
-			let posY = (ballReceptor.offsetTop - BALL_DY) / fontSize;
-			return [posX, posY];
+			this.setBallPos(this.ball.owner);
+		},
+		setBallPos(receptorId) {
+			// 根据新的player的坐标设置球的位置
+			const dx = this.getBallDx(receptorId);
+			const [playerX, playerY] = this.getPlayerPos[receptorId];
+			if (!playerX || !playerY) return;
+			// 设置球相对于player的位置
+			let posX = (playerX + dx) / (window.innerWidth / 100);
+			let posY = (playerY - BALL_DY) / fontSize;
+			this.ball.pos = [posX, posY];
 		},
 		watchWindowResize() {
-			//球的位置响应式：当窗口大小改变时，重新获取一下球的位置
+			//监听窗口大小的改变，以更新球的位置
 			window.addEventListener(
 				"resize",
 				() => {
-					this.reactiveBallPos();
+					this.updateBallPos();
 				},
 				false
 			);
@@ -297,7 +335,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .players-wrap {
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr 1fr;

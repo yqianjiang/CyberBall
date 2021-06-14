@@ -23,7 +23,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .player-leftWard {
 	transform: scale(-1, 1);
 }
