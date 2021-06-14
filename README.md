@@ -27,6 +27,7 @@ The number of players in the game is 3-9. When you get the ball, you can choose 
 - [ ] Preference of throwing ball
 - [ ] Ranking
 - [ ] Highest Score
+- [ ] Multi-language
 - [ ] Online Multi-player
 
 
