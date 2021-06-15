@@ -37,13 +37,14 @@ export default {
 <style>
 .score-board {
 	position: absolute;
-	width: 12rem;
-	height: 20rem;
 	text-align: left;
+	top: 0;
+	left: 0;
 }
 
 .grid-row {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
+	grid-column-gap: 1rem;
 }
 </style>
