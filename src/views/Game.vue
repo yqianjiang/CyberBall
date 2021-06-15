@@ -36,7 +36,7 @@ import ScoreBoard from "../components/ScoreBoard.vue";
 const fontSize = 16;
 const BALL_DX = 67;
 const BALL_DY = 5;
-const AI_DELAY_T = 1500;
+const AI_DELAY_T = 2000;
 
 const _playerLayout = {
 	rect: {

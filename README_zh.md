@@ -25,7 +25,7 @@
 
 - [x] 玩家颜色选择
 - [x] 游戏人数选择
-- [ ] 记分功能
+- [x] 记分功能
 - [ ] 投球偏好规则
 - [ ] 排行榜
 - [ ] 最高纪录
@@ -45,6 +45,7 @@ src
 ├── components                 # 公共组件目录
 │   ├── Ball.vue               # 球
 │   ├── NavButton.vue          # 页面切换按钮
+│   ├── ScoreBoard.vue         # 记分板
 │   ├── Player.vue     				 # 单个玩家
 │   └── PlayerImg.vue  				 # 单个玩家的图片
 │
