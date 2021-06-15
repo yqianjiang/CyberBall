@@ -23,7 +23,7 @@ The number of players in the game is 3-9. When you get the ball, you can choose 
 
 - [x] Customize Player Color
 - [x] Select Player Number
-- [ ] Scoring
+- [x] Scoring
 - [ ] Preference of throwing ball
 - [ ] Ranking
 - [ ] Highest Score
@@ -42,7 +42,8 @@ src
 │
 ├── components                 
 │   ├── Ball.vue               
-│   ├── NavButton.vue          
+│   ├── NavButton.vue 
+│   ├── ScoreBoard.vue          
 │   ├── Player.vue     				 
 │   └── PlayerImg.vue  				 
 │

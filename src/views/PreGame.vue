@@ -64,7 +64,7 @@ export default {
 	},
 	data() {
 		return {
-			playerName: "",
+			playerName: "player",
 			playerHue: 180,
 			playerGray: 0,
 			playerNumInput: 4,
