@@ -11,6 +11,7 @@
 					:playerStyle="playerStyle[idx]"
 					:playerName="player.name[idx]"
 					:isLeftWard="player.isLeftWard[idx]"
+					:title="score.playerCounts[idx]"
 					@moveBall="onThrowBall(idx)"
 				/>
 			</div>
