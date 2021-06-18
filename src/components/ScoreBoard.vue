@@ -4,19 +4,19 @@
 		<p>排行榜：</p>
 		<ol>
 			<li>
-				<div class="grid-row">
+				<div class="score-row">
 					<div>{{ score[0].player }}</div>
 					<div>{{ score[0].value }}</div>
 				</div>
 			</li>
 			<li>
-				<div class="grid-row">
+				<div class="score-row">
 					<div>{{ score[1].player }}</div>
 					<div>{{ score[1].value }}</div>
 				</div>
 			</li>
 			<li>
-				<div class="grid-row">
+				<div class="score-row">
 					<div>{{ score[2].player }}</div>
 					<div>{{ score[2].value }}</div>
 				</div>
@@ -42,7 +42,7 @@ export default {
 	left: 0;
 }
 
-.grid-row {
+.score-row {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	grid-column-gap: 1rem;

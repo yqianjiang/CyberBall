@@ -94,7 +94,7 @@ export default {
 			this.playerNum = this.playerNumInput;
 		},
 		checkNameInput() {
-			let name = this.playerName;
+			const name = this.playerName;
 			if (!name) {
 				alert("请输入昵称！");
 				return true;
