@@ -234,7 +234,7 @@ export default {
 			// 根据鼠标位置的x坐标，让人物控制的玩家转向跟随鼠标
 			const x = e.clientX;
 			// 未来扩展：让其他player也可以转身，但是这样还要设置他们的this.player.turnDur
-			for (let idx of [0]) {
+			for (const idx of [0]) {
 				const turnLeft = this.setPlayerDirection(x, idx);
 				if (turnLeft === -1) break;
 
