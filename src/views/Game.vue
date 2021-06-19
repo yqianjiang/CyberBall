@@ -82,16 +82,16 @@ const _getRandomIdx = (weightArr) => {
 };
 
 const _getTopIdx = (arr) => {
-	let arrSort = [...arr]; // 用于排序
-	let arrCopy = [...arr]; // 设置一个备份，避免修改原数组
+	const arrSort = [...arr]; // 用于排序
+	const arrCopy = [...arr]; // 设置一个备份，避免修改原数组
 
 	arrSort.sort((x1, x2) => x2 - x1);
 
-	let first = arrCopy.indexOf(arrSort[0]);
+	const first = arrCopy.indexOf(arrSort[0]);
 	arrCopy[first] = undefined;
-	let second = arrCopy.indexOf(arrSort[1]);
+	const second = arrCopy.indexOf(arrSort[1]);
 	arrCopy[second] = undefined;
-	let third = arrCopy.indexOf(arrSort[2]);
+	const third = arrCopy.indexOf(arrSort[2]);
 	arrCopy[third] = undefined;
 	return [first, second, third];
 };
@@ -147,7 +147,7 @@ export default {
 	},
 	computed: {
 		scoreRank() {
-			let [first, second, third] = _getTopIdx(this.score.playerCounts);
+			const [first, second, third] = _getTopIdx(this.score.playerCounts);
 			return [
 				{
 					player: this.player.name[first],
@@ -210,8 +210,8 @@ export default {
 		},
 		async gameStart() {
 			await _delayPromise(500);
-			let preferenceArr = [1, 1, 1, 1, 1, 1, 1, 1, 1].slice(0, this.player.num);
-			let receptorId = _getRandomIdx(preferenceArr);
+			const preferenceArr = [1, 1, 1, 1, 1, 1, 1, 1, 1].slice(0, this.player.num);
+			const receptorId = _getRandomIdx(preferenceArr);
 			this.throwBall(receptorId);
 		},
 		scoreCounter(idx) {
@@ -233,16 +233,14 @@ export default {
 		onPlayerTurn(e) {
 			// 根据鼠标位置的x坐标，让人物控制的玩家转向跟随鼠标
 			const x = e.clientX;
-			let dx;
-			let turnLeft;
 			// 未来扩展：让其他player也可以转身，但是这样还要设置他们的this.player.turnDur
-			for (let idx of [0]) {
-				turnLeft = this.setPlayerDirection(x, idx);
+			for (const idx of [0]) {
+				const turnLeft = this.setPlayerDirection(x, idx);
 				if (turnLeft === -1) break;
 
 				// 当转身的player拥有球时，移动球
 				if (this.ball.owner == idx) {
-					dx = turnLeft ? -BALL_DX : BALL_DX;
+					const dx = turnLeft ? -BALL_DX : BALL_DX;
 					this.shiftBallPos(dx, this.player.turnDur);
 				}
 			}
@@ -254,7 +252,7 @@ export default {
 		},
 		setPlayerDirection(x, idx) {
 			if (!this.player.refs[idx]?.offsetLeft) return -1;
-			let turnLeft = x < this.player.refs[idx].offsetLeft;
+			const turnLeft = x < this.player.refs[idx].offsetLeft;
 			if (turnLeft == this.player.isLeftWard[idx]) return -1;
 			this.player.isLeftWard[idx] = turnLeft;
 			return turnLeft;
@@ -304,7 +302,7 @@ export default {
 			}
 		},
 		async aiThrowBall() {
-			let receptorId = this.getReceptorId(this.ball.owner);
+			const receptorId = this.getReceptorId(this.ball.owner);
 			await _delayPromise(AI_DELAY_T);
 			this.throwBall(receptorId);
 		},
@@ -327,8 +325,8 @@ export default {
 			const [playerX, playerY] = this.getPlayerPos(receptorId);
 			if (!playerX || !playerY) return;
 			// 设置球相对于player的位置
-			let posX = (playerX + dx) / (window.innerWidth / 100);
-			let posY = (playerY - BALL_DY) / fontSize;
+			const posX = (playerX + dx) / (window.innerWidth / 100);
+			const posY = (playerY - BALL_DY) / fontSize;
 			this.ball.pos = [posX, posY];
 		},
 		initBallPos() {
