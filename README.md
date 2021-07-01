@@ -39,19 +39,16 @@ src
 ├── main.js                    
 ├── App.vue                    
 ├── images                     
-│
 ├── components                 
 │   ├── Ball.vue               
 │   ├── NavButton.vue 
 │   ├── ScoreBoard.vue          
 │   ├── Player.vue     				 
 │   └── PlayerImg.vue  				 
-│
 ├── views                      
 │   ├── Home.vue               
 │   ├── Game.vue               
 │   └── PreGame.vue
-│
 ├── router/index.js            
 └── stores/index.js             
 ```

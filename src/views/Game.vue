@@ -32,76 +32,12 @@ import Player from "../components/Player.vue";
 import Ball from "../components/Ball.vue";
 import NavButton from "../components/NavButton.vue";
 import ScoreBoard from "../components/ScoreBoard.vue";
+import Utils from "../utils/index.js";
 
 const fontSize = 16;
 const BALL_DX = 67;
 const BALL_DY = 5;
 const AI_DELAY_T = 2000;
-
-const _playerLayout = {
-	rect: {
-		mode1: [
-			"3 / 2 / auto / 4",
-			"2 / 1",
-			"2 / 4",
-			"1 / 2 / auto / 4",
-			"3 / 3",
-			"1 / 3",
-			"1 / 1 / 3",
-			"1 / 4 / 3",
-			"3 / 1 / auto / 3",
-		],
-		mode2: [
-			"3 / 2",
-			"2 / 1 / 4",
-			"2 / 4 / 4",
-			"1 / 2",
-			"3 / 3 / auto / 5",
-			"1 / 4 / 3",
-			"1 / 1 / 3",
-			"1 / 4 / 3",
-			"3 / 1 / auto / 3",
-		],
-	},
-	modeMap: {
-		3: [],
-		4: [],
-		5: [0],
-		6: [0, 3],
-		7: [0, 1, 2, 5],
-		8: [0, 1, 2, 3],
-		9: [1, 2, 3, 4],
-	},
-};
-
-const _getRandomIdx = (weightArr) => {
-	// 输入带权重的数组，返回随机的元素。
-	// 方法：数组中每个元素获得一个随机数，再乘以权重，对比谁比较大
-	const drawProb = weightArr.map((x) => x * Math.random());
-	return drawProb.indexOf(Math.max(...drawProb));
-};
-
-const _getTopIdx = (arr) => {
-	const arrSort = [...arr]; // 用于排序
-	const arrCopy = [...arr]; // 设置一个备份，避免修改原数组
-
-	arrSort.sort((x1, x2) => x2 - x1);
-
-	const first = arrCopy.indexOf(arrSort[0]);
-	arrCopy[first] = undefined;
-	const second = arrCopy.indexOf(arrSort[1]);
-	arrCopy[second] = undefined;
-	const third = arrCopy.indexOf(arrSort[2]);
-	arrCopy[third] = undefined;
-	return [first, second, third];
-};
-
-const _delayPromise = (delayTime) =>
-	new Promise((resolve) => {
-		setTimeout(() => {
-			resolve();
-		}, delayTime);
-	});
 
 export default {
 	components: {
@@ -147,7 +83,7 @@ export default {
 	},
 	computed: {
 		scoreRank() {
-			const [first, second, third] = _getTopIdx(this.score.playerCounts);
+			const [first, second, third] = Utils.getTopIdx(this.score.playerCounts);
 			return [
 				{
 					player: this.player.name[first],
@@ -181,10 +117,10 @@ export default {
 		},
 		gridArea() {
 			const getGridArea = (i) => {
-				if (_playerLayout.modeMap[this.player.num].includes(i)) {
-					return `grid-area: ${_playerLayout.rect.mode2[i]}`;
+				if (Utils.playerLayout.modeMap[this.player.num].includes(i)) {
+					return `grid-area: ${Utils.playerLayout.rect.mode2[i]}`;
 				} else {
-					return `grid-area: ${_playerLayout.rect.mode1[i]}`;
+					return `grid-area: ${Utils.playerLayout.rect.mode1[i]}`;
 				}
 			};
 
@@ -209,9 +145,9 @@ export default {
 			this.player.num = this.$store.getters.playerNum || this.player.num;
 		},
 		async gameStart() {
-			await _delayPromise(500);
+			await Utils.delayPromise(500);
 			const preferenceArr = [1, 1, 1, 1, 1, 1, 1, 1, 1].slice(0, this.player.num);
-			const receptorId = _getRandomIdx(preferenceArr);
+			const receptorId = Utils.getRandomIdx(preferenceArr);
 			this.throwBall(receptorId);
 		},
 		scoreCounter(idx) {
@@ -284,7 +220,7 @@ export default {
 			})(this.player.num);
 
 			// [step2]根据概率判断。第i名玩家的选择概率为 preferenceMatrix[i]
-			return _getRandomIdx(preferenceMatrix[ballOwnerIdx]);
+			return Utils.getRandomIdx(preferenceMatrix[ballOwnerIdx]);
 		},
 		getBallDx(idx) {
 			let dx = BALL_DX;
@@ -303,7 +239,7 @@ export default {
 		},
 		async aiThrowBall() {
 			const receptorId = this.getReceptorId(this.ball.owner);
-			await _delayPromise(AI_DELAY_T);
+			await Utils.delayPromise(AI_DELAY_T);
 			this.throwBall(receptorId);
 		},
 		throwBall(receptorId = 0, ballMoveDur = 0.5) {
