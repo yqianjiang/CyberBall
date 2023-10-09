@@ -75,7 +75,7 @@ export default {
 				refs: [],
 			},
 			ball: {
-				pos: [0, 0],
+				pos: [-10, -10],
 				moveDur: 0,
 				owner: undefined,
 			},
@@ -145,10 +145,11 @@ export default {
 			this.player.num = this.$store.getters.playerNum || this.player.num;
 		},
 		async gameStart() {
-			await Utils.delayPromise(500);
-			const preferenceArr = [1, 1, 1, 1, 1, 1, 1, 1, 1].slice(0, this.player.num);
-			const receptorId = Utils.getRandomIdx(preferenceArr);
-			this.throwBall(receptorId);
+			await Utils.sleep(500);
+			// const preferenceArr = [1, 1, 1, 1, 1, 1, 1, 1, 1].slice(0, this.player.num);
+			// const receptorId = Utils.getRandomIdx(preferenceArr);
+			// this.throwBall(receptorId);
+			this.throwBall(0, 0);
 		},
 		scoreCounter(idx) {
 			this.score.throwCounts++;
@@ -193,14 +194,17 @@ export default {
 			this.player.isLeftWard[idx] = turnLeft;
 			return turnLeft;
 		},
-		getPlayerPos(idx) {
+		getPlayerPos(idx) {  // TODO: 这个值应该是可以缓存的。player坐标只有onresize时候会变。
 			const receptor = this.player.refs[idx];
 			if (!receptor) {
 				console.log("reference error!");
 				return [undefined, undefined];
 			}
-			return [receptor.offsetLeft, receptor.offsetTop];
+			let x = receptor.getClientRects()[0].left;
+			let y = receptor.getClientRects()[0].top;
+			return [x, y];
 		},
+
 		getReceptorId(ballOwnerIdx) {
 			// 根据当前的ball.owner，返回目标的ball.receptor的id。
 			// [step1]初始化preferenceMatrix 【n*n】 (0,0) (0,1) ... 对角线为0，第0行表示从player出发的（可以忽略）
@@ -239,7 +243,7 @@ export default {
 		},
 		async aiThrowBall() {
 			const receptorId = this.getReceptorId(this.ball.owner);
-			await Utils.delayPromise(AI_DELAY_T);
+			await Utils.sleep(AI_DELAY_T);
 			this.throwBall(receptorId);
 		},
 		throwBall(receptorId = 0, ballMoveDur = 0.5) {
@@ -288,7 +292,7 @@ export default {
 	},
 	mounted() {
 		this.loadConfigs();
-		this.initBallPos();
+		// this.initBallPos();
 		this.watchWindowResize();
 		this.gameStart();
 	},

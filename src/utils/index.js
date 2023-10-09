@@ -1,4 +1,3 @@
-
 const playerLayout = {
 	rect: {
 		mode1: [
@@ -57,17 +56,14 @@ const getTopIdx = (arr) => {
 	return [first, second, third];
 };
 
-const delayPromise = (delayTime) =>
+const sleep = (delayTime) =>
 	new Promise((resolve) => {
-		setTimeout(() => {
-			resolve();
-		}, delayTime);
+		setTimeout(resolve, delayTime);
 	});
 
-
 export default {
-  playerLayout,
-  getRandomIdx,
-  getTopIdx,
-  delayPromise,
-}
+	playerLayout,
+	getRandomIdx,
+	getTopIdx,
+	sleep,
+};
