@@ -3,22 +3,10 @@
 		<p>目前球数：{{ throwNum }}</p>
 		<p>排行榜：</p>
 		<ol>
-			<li>
+			<li v-for="i in 3" :key="i">
 				<div class="score-row">
-					<div>{{ score[0].player }}</div>
-					<div>{{ score[0].value }}</div>
-				</div>
-			</li>
-			<li>
-				<div class="score-row">
-					<div>{{ score[1].player }}</div>
-					<div>{{ score[1].value }}</div>
-				</div>
-			</li>
-			<li>
-				<div class="score-row">
-					<div>{{ score[2].player }}</div>
-					<div>{{ score[2].value }}</div>
+					<div>{{ score[i-1].player }}</div>
+					<div>{{ score[i-1].value }}</div>
 				</div>
 			</li>
 		</ol>
@@ -38,8 +26,12 @@ export default {
 .score-board {
 	position: absolute;
 	text-align: left;
-	top: 0;
-	left: 0;
+	top: 8px;
+	left: 8px;
+	background: rgba(255,255,255,0.6);
+	padding: 8px;
+	border-radius: 8px;
+	border: 1px solid #bbb;
 }
 
 .score-row {
