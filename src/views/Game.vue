@@ -11,13 +11,14 @@
 					:playerStyle="playerStyle[idx]"
 					:playerName="player.name[idx]"
 					:isLeftWard="player.isLeftWard[idx]"
-					:title="score.playerCounts[idx]"
+					:title="`分数：${score.playerCounts[idx]}`"
 					@moveBall="onThrowBall(idx)"
+					@playerLoaded="idx===0?throwBall(0, 0):null"
 				/>
 			</div>
 		</div>
 
-		<Ball :style="ballStyle" />
+		<Ball :posx="ball.pos[0]" :posy="ball.pos[1]" :moveDur="ball.moveDur" />
 
 		<ScoreBoard :throwNum="score.throwCounts" :score="scoreRank" />
 
@@ -32,76 +33,15 @@ import Player from "../components/Player.vue";
 import Ball from "../components/Ball.vue";
 import NavButton from "../components/NavButton.vue";
 import ScoreBoard from "../components/ScoreBoard.vue";
+import Utils from "../utils/index.js";
 
 const fontSize = 16;
 const BALL_DX = 67;
 const BALL_DY = 5;
 const AI_DELAY_T = 2000;
-
-const _playerLayout = {
-	rect: {
-		mode1: [
-			"3 / 2 / auto / 4",
-			"2 / 1",
-			"2 / 4",
-			"1 / 2 / auto / 4",
-			"3 / 3",
-			"1 / 3",
-			"1 / 1 / 3",
-			"1 / 4 / 3",
-			"3 / 1 / auto / 3",
-		],
-		mode2: [
-			"3 / 2",
-			"2 / 1 / 4",
-			"2 / 4 / 4",
-			"1 / 2",
-			"3 / 3 / auto / 5",
-			"1 / 4 / 3",
-			"1 / 1 / 3",
-			"1 / 4 / 3",
-			"3 / 1 / auto / 3",
-		],
-	},
-	modeMap: {
-		3: [],
-		4: [],
-		5: [0],
-		6: [0, 3],
-		7: [0, 1, 2, 5],
-		8: [0, 1, 2, 3],
-		9: [1, 2, 3, 4],
-	},
+const cacheVals = {
+	playerPos: {},
 };
-
-const _getRandomIdx = (weightArr) => {
-	// 输入带权重的数组，返回随机的元素。
-	// 方法：数组中每个元素获得一个随机数，再乘以权重，对比谁比较大
-	const drawProb = weightArr.map((x) => x * Math.random());
-	return drawProb.indexOf(Math.max(...drawProb));
-};
-
-const _getTopIdx = (arr) => {
-	const arrSort = [...arr]; // 用于排序
-	const arrCopy = [...arr]; // 设置一个备份，避免修改原数组
-
-	arrSort.sort((x1, x2) => x2 - x1);
-
-	const first = arrCopy.indexOf(arrSort[0]);
-	arrCopy[first] = undefined;
-	const second = arrCopy.indexOf(arrSort[1]);
-	arrCopy[second] = undefined;
-	const third = arrCopy.indexOf(arrSort[2]);
-	arrCopy[third] = undefined;
-	return [first, second, third];
-};
-
-const _delayPromise = (delayTime) =>
-	new Promise((resolve) => {
-		setTimeout(() => {
-			resolve();
-		}, delayTime);
-	});
 
 export default {
 	components: {
@@ -139,7 +79,7 @@ export default {
 				refs: [],
 			},
 			ball: {
-				pos: [0, 0],
+				pos: [-10, -10],
 				moveDur: 0,
 				owner: undefined,
 			},
@@ -147,7 +87,7 @@ export default {
 	},
 	computed: {
 		scoreRank() {
-			const [first, second, third] = _getTopIdx(this.score.playerCounts);
+			const [first, second, third] = Utils.getTopIdx(this.score.playerCounts);
 			return [
 				{
 					player: this.player.name[first],
@@ -181,10 +121,10 @@ export default {
 		},
 		gridArea() {
 			const getGridArea = (i) => {
-				if (_playerLayout.modeMap[this.player.num].includes(i)) {
-					return `grid-area: ${_playerLayout.rect.mode2[i]}`;
+				if (Utils.playerLayout.modeMap[this.player.num].includes(i)) {
+					return `grid-area: ${Utils.playerLayout.rect.mode2[i]}`;
 				} else {
-					return `grid-area: ${_playerLayout.rect.mode1[i]}`;
+					return `grid-area: ${Utils.playerLayout.rect.mode1[i]}`;
 				}
 			};
 
@@ -193,11 +133,6 @@ export default {
 				newList.push(getGridArea(i));
 			}
 			return newList;
-		},
-
-		// ball相关
-		ballStyle() {
-			return `transform:translate(${this.ball.pos[0]}vw, ${this.ball.pos[1]}rem); transition: ${this.ball.moveDur}s linear`;
 		},
 	},
 	methods: {
@@ -208,12 +143,6 @@ export default {
 			this.player.gray = this.$store.getters.playerGray || this.player.gray;
 			this.player.num = this.$store.getters.playerNum || this.player.num;
 		},
-		async gameStart() {
-			await _delayPromise(500);
-			const preferenceArr = [1, 1, 1, 1, 1, 1, 1, 1, 1].slice(0, this.player.num);
-			const receptorId = _getRandomIdx(preferenceArr);
-			this.throwBall(receptorId);
-		},
 		scoreCounter(idx) {
 			this.score.throwCounts++;
 			this.score.playerCounts[idx]++;
@@ -223,7 +152,9 @@ export default {
 			window.addEventListener(
 				"resize",
 				() => {
-					this.updateBallPos();
+					// 暂停游戏（暂停球的移动）
+					this.updateBallPosOnResize();   // TODO: 防抖
+					// 继续游戏
 				},
 				false
 			);
@@ -257,14 +188,23 @@ export default {
 			this.player.isLeftWard[idx] = turnLeft;
 			return turnLeft;
 		},
-		getPlayerPos(idx) {
+		getPlayerPos(idx, isPlayerPosChange) {
+			// 优先读取缓存值
+			if (!isPlayerPosChange && cacheVals.playerPos[idx]) {
+				return cacheVals.playerPos[idx];
+			}
+			// 发生过变化，获取最新的值
 			const receptor = this.player.refs[idx];
 			if (!receptor) {
 				console.log("reference error!");
 				return [undefined, undefined];
 			}
-			return [receptor.offsetLeft, receptor.offsetTop];
+			let x = receptor.getClientRects()[0].left;
+			let y = receptor.getClientRects()[0].top;
+			cacheVals.playerPos[idx] = [x, y];  // 缓存起来
+			return [x, y];
 		},
+
 		getReceptorId(ballOwnerIdx) {
 			// 根据当前的ball.owner，返回目标的ball.receptor的id。
 			// [step1]初始化preferenceMatrix 【n*n】 (0,0) (0,1) ... 对角线为0，第0行表示从player出发的（可以忽略）
@@ -284,7 +224,7 @@ export default {
 			})(this.player.num);
 
 			// [step2]根据概率判断。第i名玩家的选择概率为 preferenceMatrix[i]
-			return _getRandomIdx(preferenceMatrix[ballOwnerIdx]);
+			return Utils.getRandomIdx(preferenceMatrix[ballOwnerIdx]);
 		},
 		getBallDx(idx) {
 			let dx = BALL_DX;
@@ -303,7 +243,7 @@ export default {
 		},
 		async aiThrowBall() {
 			const receptorId = this.getReceptorId(this.ball.owner);
-			await _delayPromise(AI_DELAY_T);
+			await Utils.sleep(AI_DELAY_T);
 			this.throwBall(receptorId);
 		},
 		throwBall(receptorId = 0, ballMoveDur = 0.5) {
@@ -319,30 +259,30 @@ export default {
 				this.aiThrowBall();
 			}
 		},
-		setBallPos(receptorId) {
+		setBallPos(receptorId, isPlayerPosChange=false) {
 			// 根据新的player的坐标设置球的位置
 			const dx = this.getBallDx(receptorId);
-			const [playerX, playerY] = this.getPlayerPos(receptorId);
+			const [playerX, playerY] = this.getPlayerPos(receptorId, isPlayerPosChange);
 			if (!playerX || !playerY) return;
 			// 设置球相对于player的位置
 			const posX = (playerX + dx) / (window.innerWidth / 100);
 			const posY = (playerY - BALL_DY) / fontSize;
 			this.ball.pos = [posX, posY];
 		},
-		initBallPos() {
+		resetBallPos() {
 			// 初始化球的位置：在中间
 			this.ball.pos = [
 				50 - 32 / 2 / (window.innerWidth / 100),
 				(window.innerHeight - 32) / fontSize / 2,
 			];
 		},
-		updateBallPos() {
+		updateBallPosOnResize() {
 			// 根据窗口变化更新球的位置
 			this.ball.moveDur = 0;
 			if (!this.ball.owner) {
-				this.initBallPos();
+				this.resetBallPos();
 			}
-			this.setBallPos(this.ball.owner);
+			this.setBallPos(this.ball.owner, true);
 		},
 		shiftBallPos(dx, moveDur) {
 			// 根据dx值平移球的位置
@@ -352,9 +292,7 @@ export default {
 	},
 	mounted() {
 		this.loadConfigs();
-		this.initBallPos();
 		this.watchWindowResize();
-		this.gameStart();
 	},
 	beforeUpdate() {
 		this.player.refs = [];

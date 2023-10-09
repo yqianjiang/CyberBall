@@ -11,8 +11,8 @@ export default {
 <style>
 #menu-btn {
 	position: absolute;
-	top: 0;
-	right: 0;
+	top: 8px;
+	right: 8px;
 }
 
 #menu-btn > button {
@@ -31,6 +31,20 @@ button {
 	height: 2rem;
 	width: 8rem;
 	font-size: 1rem;
+	background: #fff;
+	outline: none;
+	border: 1px solid #aaa;
+	border-radius: 8px;
+}
+button:hover {
+	cursor: pointer;
+	background-color: #eee;
+}
+input {
+	border-radius: 8px;
+	outline: none;
+	border: 1px solid #aaa;
+	padding: 4px 8px;
 }
 
 /* 包裹游戏页面中的主要内容 */

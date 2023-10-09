@@ -55,9 +55,9 @@ function usePlayer() {
     7: [0, 1, 2, 5],
     8: [0, 1, 2, 3],
     9: [1, 2, 3, 4],
-  },
+  }
 
-  let playerStyle = computed(()=>{
+  const playerStyle = computed(()=>{
     const getStyleStr = (hue, gray, turnDur) =>
     `filter: ${player.filter} hue-rotate(${hue}deg) grayscale(${gray}%); transition:${turnDur}s linear`;
 
@@ -72,7 +72,7 @@ function usePlayer() {
     return newList;    
   })
 
-  let gridArea = computed (() => {
+  const gridArea = computed (() => {
     const getGridArea = (i) => {
       if (_modeMap[player.num].includes(i)) {
         return `grid-area: ${_playerRects.mode2[i]}`;

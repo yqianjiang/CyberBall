@@ -11,5 +11,6 @@ export default {
 <style>
 .player-img {
 	width: 6rem;
+	cursor: pointer;
 }
 </style>

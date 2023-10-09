@@ -4,6 +4,7 @@
 			:class="isLeftWard ? 'player-leftWard' : 'player-rightWard'"
 			:style="playerStyle"
 			@click="$emit('moveBall')"
+			@load="$emit('playerLoaded')"
 		/>
 		<p>{{ playerName }}</p>
 	</div>
@@ -19,7 +20,7 @@ export default {
 		playerStyle: String,
 		playerName: String,
 	},
-	emits: ["moveBall"],
+	emits: ["moveBall", "playerLoaded"],
 };
 </script>
 

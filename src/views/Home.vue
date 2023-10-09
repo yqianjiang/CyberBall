@@ -40,11 +40,11 @@ export default {
 .ball-ani {
 	width: 3rem;
 	animation-duration: 0.6s;
-	animation-name: myFrame;
+	animation-name: my-frame;
 	animation-iteration-count: infinite;
 	animation-direction: alternate;
 }
-@keyframes myFrame {
+@keyframes my-frame {
 	50% {
 		transform: translate(0, -4rem) rotate(180deg);
 	}

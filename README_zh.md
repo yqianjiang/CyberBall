@@ -41,19 +41,16 @@ src
 ├── main.js                    # 项目入口
 ├── App.vue                    # 组件入口
 ├── images                     # 图片目录
-│
 ├── components                 # 公共组件目录
 │   ├── Ball.vue               # 球
 │   ├── NavButton.vue          # 页面切换按钮
 │   ├── ScoreBoard.vue         # 记分板
 │   ├── Player.vue     				 # 单个玩家
 │   └── PlayerImg.vue  				 # 单个玩家的图片
-│
 ├── views                      # 页面目录
 │   ├── Home.vue               # 主页
 │   ├── Game.vue               # 游戏页面
 │   └── PreGame.vue            # 游戏准备页面
-│
 ├── router/index.js            # 路由
 └── stores/index.js            # 全局状态管理 
 ```

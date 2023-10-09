@@ -6,8 +6,6 @@ function useBall() {
     receptor: 1,
   })
 
-  let ballStyle = computed(()=>`transform:translate(${ball.pos[0]}vw, ${ball.pos[1]}rem); transition: ${ball.moveDur}s linear`)
-
   function getTargetPos(dx, playerRefs) {
     // 供外部使用：提供playerRefs的列表（原this.player.refs），本函数会根据player得到对应的球的目标坐标。
     // 命名为：setBallPos
@@ -41,7 +39,7 @@ function useBall() {
 
     // 如果球到其他玩家手中，执行一个判断...
     if (ball.owner > 1) {
-      aiMoveBall();
+      aiThrowBall();
     }
   }
 
@@ -55,20 +53,15 @@ function useBall() {
       ball.pos = getTargetPos(dx, playerRefs);
   }
 
-  async function aiMoveBall(receptorId) {
-    await new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, AI_DELAY_T);
-    });
+  async function aiThrowBall(receptorId) {
+    await Utils.sleep(AI_DELAY_T);
     moveBall(receptorId);
   }
 
   return {
     ball,
-    ballStyle,
     reactiveBallPos,
-    aiMoveBall,
+    aiThrowBall,
     moveBall,
   }
 }
