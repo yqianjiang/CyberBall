@@ -1,1 +1,0 @@
-import{_ as e,o as s,c as t}from"./index-07d8dca4.js";const r="/CyberBall/assets/idle-right-75e88a49.png";const _={name:"PlayerImg"},a={class:"player-img",src:r};function o(c,n,l,p,i,m){return s(),t("img",a)}const y=e(_,[["render",o]]);export{y as P};
