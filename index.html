@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cyberball</title>
+    <style>
+      * {
+        margin: 0;
+      }
+
+      /* body里层的游戏画布，设置画布大小及背景 */
+      .game-canvas {
+        /* 大小：充满屏幕 */
+        margin: 0 auto;
+        height: 100vh;
+        /* 背景图片 */
+        background-image: url(background.jpg);
+        background-position: center;
+        background-size: cover;
+      }
+
+      /* 包裹整个游戏，不同页面的共同设置 */
+      .canvas-wrap {
+        display: flex;
+        height: 100%;
+      }
+    </style>
+    <script type="module" crossorigin src="/CyberBall/assets/index-07d8dca4.js"></script>
+    <link rel="stylesheet" href="/CyberBall/assets/index-02e74f43.css">
+  </head>
+  <body>
+    <div class="game-canvas">
+      <div id="app" class="canvas-wrap">
+      </div>
+      <!-- built files will be auto injected -->
+    </div>
+    
+  </body>
+</html>
