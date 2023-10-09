@@ -1,6 +1,5 @@
 import { createStore } from "vuex";
-
-var storage = require("store");
+import storage from "store";
 
 function _localStorageWrite(varName, value, isSave) {
 	if (isSave && value) {
