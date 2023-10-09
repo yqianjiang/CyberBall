@@ -153,6 +153,7 @@ export default {
 				"resize",
 				() => {
 					// 暂停游戏（暂停球的移动）
+					cacheVals.playerPos = {};       // 清除缓存值（playerPos改变了）
 					this.updateBallPosOnResize();   // TODO: 防抖
 					// 继续游戏
 				},
@@ -188,9 +189,9 @@ export default {
 			this.player.isLeftWard[idx] = turnLeft;
 			return turnLeft;
 		},
-		getPlayerPos(idx, isPlayerPosChange) {
+		getPlayerPos(idx) {
 			// 优先读取缓存值
-			if (!isPlayerPosChange && cacheVals.playerPos[idx]) {
+			if (cacheVals.playerPos[idx]) {
 				return cacheVals.playerPos[idx];
 			}
 			// 发生过变化，获取最新的值
@@ -199,9 +200,11 @@ export default {
 				console.log("reference error!");
 				return [undefined, undefined];
 			}
-			let x = receptor.getClientRects()[0].left;
-			let y = receptor.getClientRects()[0].top;
-			cacheVals.playerPos[idx] = [x, y];  // 缓存起来
+			let x = receptor.getClientRects()[0]?.left;
+			let y = receptor.getClientRects()[0]?.top;
+			if (x !== undefined && y !== undefined) {
+				cacheVals.playerPos[idx] = [x, y];  // 缓存起来
+			}
 			return [x, y];
 		},
 
@@ -259,10 +262,10 @@ export default {
 				this.aiThrowBall();
 			}
 		},
-		setBallPos(receptorId, isPlayerPosChange=false) {
+		setBallPos(receptorId) {
 			// 根据新的player的坐标设置球的位置
 			const dx = this.getBallDx(receptorId);
-			const [playerX, playerY] = this.getPlayerPos(receptorId, isPlayerPosChange);
+			const [playerX, playerY] = this.getPlayerPos(receptorId);
 			if (!playerX || !playerY) return;
 			// 设置球相对于player的位置
 			const posX = (playerX + dx) / (window.innerWidth / 100);
@@ -282,7 +285,7 @@ export default {
 			if (!this.ball.owner) {
 				this.resetBallPos();
 			}
-			this.setBallPos(this.ball.owner, true);
+			this.setBallPos(this.ball.owner);
 		},
 		shiftBallPos(dx, moveDur) {
 			// 根据dx值平移球的位置
